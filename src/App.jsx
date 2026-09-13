@@ -1,0 +1,244 @@
+import { useState } from 'react';
+import { Building2, Heart, Mail, MapPin, Menu, Phone, PlusCircle, X } from 'lucide-react';
+import HomePage from './components/HomePage';
+import DirectoryPage from './components/DirectoryPage';
+import PropertyDetailsPage from './components/PropertyDetailsPage';
+import SubmitPropertyPage from './components/SubmitPropertyPage';
+import AdminCRM from './components/AdminCRM';
+import { AboutPage, ContactPage, PrivacyPolicyPage, TermsPage, WishlistPage } from './components/OtherPages';
+import { INITIAL_PROPERTIES } from './data/properties';
+import whatsappIcon from './assets/whatsapp.png';
+import messengerIcon from './assets/messenger.png';
+
+export default function App() {
+  const [currentPage, setCurrentPage] = useState('home');
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [properties] = useState(INITIAL_PROPERTIES);
+  const [wishlist, setWishlist] = useState([]);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [adminPin, setAdminPin] = useState('');
+
+  const [searchFilters, setSearchFilters] = useState({
+    type: 'all',
+    area: 'all',
+    category: 'all',
+    maxPrice: ''
+  });
+
+  const toggleWishlist = (id) => {
+    setWishlist((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const navigateTo = (page, property = null) => {
+    setCurrentPage(page);
+    if (property) setSelectedProperty(property);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setIsMobileMenuOpen(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans flex flex-col justify-between">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          <div onClick={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
+            <div className="bg-[#00875A] text-white p-2 rounded-lg">
+              <Building2 className="w-5 h-5" />
+            </div>
+            <div>
+              <span className="text-xl font-bold text-gray-900 block leading-none">Land&Flat</span>
+              <span className="text-[10px] text-[#00875A] font-semibold tracking-wide">বরিশাল সিটি</span>
+            </div>
+          </div>
+
+          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+            <button onClick={() => navigateTo('home')} className={currentPage === 'home' ? 'text-[#00875A] font-bold' : 'hover:text-[#00875A]'}>হোম</button>
+            <button onClick={() => navigateTo('land')} className={currentPage === 'land' ? 'text-[#00875A] font-bold' : 'hover:text-[#00875A]'}>জমি</button>
+            <button onClick={() => navigateTo('flat')} className={currentPage === 'flat' ? 'text-[#00875A] font-bold' : 'hover:text-[#00875A]'}>ফ্ল্যাট</button>
+            <button onClick={() => navigateTo('about')} className={currentPage === 'about' ? 'text-[#00875A] font-bold' : 'hover:text-[#00875A]'}>আমাদের সম্পর্কে</button>
+            <button onClick={() => navigateTo('contact')} className={currentPage === 'contact' ? 'text-[#00875A] font-bold' : 'hover:text-[#00875A]'}>যোগাযোগ</button>
+          </nav>
+
+          <div className="hidden md:flex items-center space-x-3">
+            <button onClick={() => navigateTo('wishlist')} className="p-2 text-gray-600 hover:text-[#00875A] relative">
+              <Heart className="w-5 h-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+
+            <button onClick={() => navigateTo('submit')} className="bg-[#00875A] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#006644] transition flex items-center gap-1.5 shadow-sm">
+              <PlusCircle className="w-4 h-4" /> জমি/ফ্ল্যাট দিন
+            </button>
+
+            <button onClick={() => navigateTo('admin')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg font-medium">
+              এডমিন CRM
+            </button>
+          </div>
+
+          <div className="flex items-center gap-2 md:hidden">
+            <button onClick={() => navigateTo('wishlist')} className="p-2 text-gray-600 relative">
+              <Heart className="w-5 h-5" />
+              {wishlist.length > 0 && (
+                <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                  {wishlist.length}
+                </span>
+              )}
+            </button>
+            <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="p-2 text-gray-700">
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
+        </div>
+
+        {isMobileMenuOpen && (
+          <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 space-y-3">
+            <button onClick={() => navigateTo('home')} className="block w-full text-left py-2 text-gray-800 font-medium">হোম</button>
+            <button onClick={() => navigateTo('land')} className="block w-full text-left py-2 text-gray-800 font-medium">জমি</button>
+            <button onClick={() => navigateTo('flat')} className="block w-full text-left py-2 text-gray-800 font-medium">ফ্ল্যাট</button>
+            <button onClick={() => navigateTo('about')} className="block w-full text-left py-2 text-gray-800 font-medium">আমাদের সম্পর্কে</button>
+            <button onClick={() => navigateTo('contact')} className="block w-full text-left py-2 text-gray-800 font-medium">যোগাযোগ</button>
+            <div className="pt-2 flex flex-col gap-2">
+              <button onClick={() => navigateTo('submit')} className="w-full bg-[#00875A] text-white py-2 rounded-lg font-medium text-center flex items-center justify-center gap-2">
+                <PlusCircle className="w-4 h-4" /> জমি/ফ্ল্যাট দিন
+              </button>
+              <button onClick={() => navigateTo('admin')} className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium text-center text-xs">
+                এডমিন প্যানেল (CRM)
+              </button>
+            </div>
+          </div>
+        )}
+      </header>
+
+      <main className="flex-grow">
+        {currentPage === 'home' && (
+          <HomePage
+            properties={properties}
+            navigateTo={navigateTo}
+            wishlist={wishlist}
+            toggleWishlist={toggleWishlist}
+            searchFilters={searchFilters}
+            setSearchFilters={setSearchFilters}
+          />
+        )}
+
+        {currentPage === 'land' && (
+          <DirectoryPage type="land" properties={properties.filter((p) => p.type === 'land')} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
+        )}
+
+        {currentPage === 'flat' && (
+          <DirectoryPage type="flat" properties={properties.filter((p) => p.type === 'flat')} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
+        )}
+
+        {currentPage === 'area' && (
+          <DirectoryPage type="all" properties={properties} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
+        )}
+
+        {currentPage === 'details' && selectedProperty && (
+          <PropertyDetailsPage property={selectedProperty} properties={properties} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} />
+        )}
+
+        {currentPage === 'submit' && <SubmitPropertyPage navigateTo={navigateTo} />}
+        {currentPage === 'about' && <AboutPage />}
+        {currentPage === 'contact' && <ContactPage />}
+        {currentPage === 'privacy' && <PrivacyPolicyPage />}
+        {currentPage === 'terms' && <TermsPage />}
+        {currentPage === 'wishlist' && (
+          <WishlistPage properties={properties.filter((p) => wishlist.includes(p.id))} navigateTo={navigateTo} toggleWishlist={toggleWishlist} />
+        )}
+        {currentPage === 'admin' && (
+          <AdminCRM
+            properties={properties}
+            isLoggedIn={isAdminLoggedIn}
+            setIsLoggedIn={setIsAdminLoggedIn}
+            pin={adminPin}
+            setPin={setAdminPin}
+          />
+        )}
+      </main>
+
+      <footer className="bg-gray-900 text-gray-300 pt-12 pb-8 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+          <div>
+            <div className="flex items-center gap-2 text-white font-bold text-lg mb-3">
+              <div className="bg-[#00875A] p-1.5 rounded">
+                <Building2 className="w-4 h-4 text-white" />
+              </div>
+              Land&Flat Barisal
+            </div>
+            <p className="text-xs text-gray-400 leading-relaxed">
+              বরিশাল শহরের আমতলা, সিএন্ডবি রোড, বগুড়া রোড ও রুপাতলীতে শতভাগ ভেরিফাইড জমি ও ফ্ল্যাট কেনাবেচার বিশ্বস্ত মাধ্যম।
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-white text-sm font-semibold mb-3">দ্রুত লিঙ্ক</h4>
+            <ul className="space-y-2 text-xs">
+              <li><button onClick={() => navigateTo('home')} className="hover:text-white">হোম</button></li>
+              <li><button onClick={() => navigateTo('land')} className="hover:text-white">আমতলার জমি</button></li>
+              <li><button onClick={() => navigateTo('flat')} className="hover:text-white">বগুড়া রোডের ফ্ল্যাট</button></li>
+              <li><button onClick={() => navigateTo('submit')} className="hover:text-white">জমি বা ফ্ল্যাট দিন</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white text-sm font-semibold mb-3">জরুরি সেবা</h4>
+            <ul className="space-y-2 text-xs">
+              <li><button onClick={() => navigateTo('about')} className="hover:text-white">আমাদের সম্পর্কে</button></li>
+              <li><button onClick={() => navigateTo('contact')} className="hover:text-white">যোগাযোগ ও হেল্পলাইন</button></li>
+              <li><button onClick={() => navigateTo('privacy')} className="hover:text-white">প্রাইভেসি পলিসি</button></li>
+              <li><button onClick={() => navigateTo('terms')} className="hover:text-white">টার্মস অ্যান্ড কন্ডিশন</button></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-white text-sm font-semibold mb-3">বরিশাল অফিস</h4>
+            <p className="text-xs text-gray-400 mb-2 flex items-start gap-2">
+              <MapPin className="w-4 h-4 text-[#00875A] shrink-0 mt-0.5" />
+              সদর রোড, বরিশাল সদর, বরিশাল।
+            </p>
+            <p className="text-xs text-gray-400 mb-2 flex items-center gap-2">
+              <Phone className="w-4 h-4 text-[#00875A] shrink-0" />
+              01749646441
+            </p>
+            <p className="text-xs text-gray-400 flex items-center gap-2">
+              <Mail className="w-4 h-4 text-[#00875A] shrink-0" />
+              fahimukil49@gmail.com
+            </p>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
+          &copy; 2026 Land&Flat Barisal. All rights reserved.
+        </div>
+      </footer>
+
+      <div className="fixed right-5 bottom-5 z-50 flex flex-col gap-3">
+        <a
+          href="https://wa.me/8801749646441"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="WhatsApp-এ যোগাযোগ করুন"
+          title="WhatsApp-এ যোগাযোগ করুন"
+          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#25D366] shadow-lg transition hover:scale-105"
+        >
+          <img src={whatsappIcon} alt="WhatsApp" className="h-10 w-10 object-contain" />
+        </a>
+        <a
+          href="https://business.facebook.com/latest/inbox/all/?nav_ref=manage_page_ap_plus_inbox_message_button&asset_id=1228252993699966"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Messenger-এ যোগাযোগ করুন"
+          title="Messenger-এ যোগাযোগ করুন"
+          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#0084FF] shadow-lg transition hover:scale-105"
+        >
+          <img src={messengerIcon} alt="Messenger" className="h-10 w-10 object-contain" />
+        </a>
+      </div>
+    </div>
+  );
+}
