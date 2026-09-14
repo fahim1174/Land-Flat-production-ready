@@ -1,12 +1,12 @@
 import { useState } from 'react';
-import { ArrowRight, ChevronDown, FileText, MapPin, Search, ShieldCheck, UserCheck } from 'lucide-react';
+import { ArrowRight, ChevronDown, FileText, FolderOpen, MapPin, Search, ShieldCheck, UserCheck } from 'lucide-react';
 import PropertyCard from './PropertyCard';
 import { BARISAL_LOCATIONS } from '../data/properties';
 import heroImage from '../assets/hero.png.jpg';
 
 export default function HomePage({ properties, navigateTo, wishlist, toggleWishlist, searchFilters, setSearchFilters }) {
   const [openFaq, setOpenFaq] = useState(0);
-  const popularAreas = ['আমতলা', 'বগুড়া রোড', 'সিএন্ডবি রোড', 'রুপাতলী'];
+  const popularAreas = BARISAL_LOCATIONS;
   const testimonials = [
     { name: 'সাব্বির আহমেদ', role: 'জমি ক্রেতা, আমতলা', text: 'সঠিক তথ্য ও site visit-এর সহায়তায় খুব সহজে আমাদের পরিবারের জন্য জমি বেছে নিতে পেরেছি।' },
     { name: 'তানজিলা রহমান', role: 'ফ্ল্যাট ক্রেতা, বগুড়া রোড', text: 'প্রপার্টির details এক জায়গায় পাওয়া এবং প্রতিনিধি দলের দ্রুত response আমার জন্য দারুণ helpful ছিল।' },
@@ -159,8 +159,11 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
 
       <section className="max-w-7xl mx-auto px-4 py-12">
         <div className="flex items-end justify-between mb-6"><div><h2 className="text-xl sm:text-2xl font-bold text-gray-900">এলাকা অনুযায়ী প্রপার্টি দেখুন</h2><p className="text-xs sm:text-sm text-gray-500 mt-1">আপনার পছন্দের বরিশাল location থেকে শুরু করুন</p></div></div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {popularAreas.map((area) => <button key={area} onClick={() => { setSearchFilters({ ...searchFilters, area }); navigateTo('area'); }} className="group text-left bg-white rounded-xl p-5 shadow-sm hover:shadow-md transition"><MapPin className="w-7 h-7 text-[#00875A] mb-4" /><span className="block font-bold text-gray-900 group-hover:text-[#00875A]">{area}</span><span className="text-xs text-gray-500">জমি ও ফ্ল্যাট দেখুন <ArrowRight className="inline w-3 h-3" /></span></button>)}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {popularAreas.map((area) => {
+            const areaCount = properties.filter((property) => property.area.includes(area)).length;
+            return <button key={area} onClick={() => { setSearchFilters({ ...searchFilters, area }); navigateTo('area'); }} className="group relative overflow-hidden text-left bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-[#00875A] hover:shadow-md transition"><FolderOpen className="w-9 h-9 text-[#00875A] mb-4" /><span className="block font-bold text-gray-900 group-hover:text-[#00875A]">{area}, বরিশাল</span><span className="mt-1 block text-xs text-gray-500">{areaCount} টি listing <ArrowRight className="inline w-3 h-3" /></span></button>;
+          })}
         </div>
       </section>
 

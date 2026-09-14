@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Building2, Heart, Mail, MapPin, Menu, Phone, PlusCircle, X } from 'lucide-react';
 import HomePage from './components/HomePage';
 import DirectoryPage from './components/DirectoryPage';
@@ -13,11 +13,27 @@ import messengerIcon from './assets/messenger.png';
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedProperty, setSelectedProperty] = useState(null);
-  const [properties] = useState(INITIAL_PROPERTIES);
+  const [properties, setProperties] = useState(() => {
+    const savedProperties = localStorage.getItem('land-flat-properties');
+    if (!savedProperties) return INITIAL_PROPERTIES;
+    return JSON.parse(savedProperties).map((property) => {
+      const initialProperty = INITIAL_PROPERTIES.find((item) => item.id === property.id);
+      return {
+        ...property,
+        leadCount: property.leadCount ?? initialProperty?.leadCount ?? 0,
+        viewCount: property.viewCount ?? initialProperty?.viewCount ?? 0
+      };
+    });
+  });
+  const publishedProperties = properties.filter((property) => property.status === 'Published');
   const [wishlist, setWishlist] = useState([]);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
   const [adminPin, setAdminPin] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('land-flat-properties', JSON.stringify(properties));
+  }, [properties]);
 
   const [searchFilters, setSearchFilters] = useState({
     type: 'all',
@@ -34,7 +50,12 @@ export default function App() {
 
   const navigateTo = (page, property = null) => {
     setCurrentPage(page);
-    if (property) setSelectedProperty(property);
+    if (property) {
+      setSelectedProperty(property);
+      if (page === 'details') {
+        setProperties((current) => current.map((item) => item.id === property.id ? { ...item, viewCount: (item.viewCount || 0) + 1 } : item));
+      }
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
     setIsMobileMenuOpen(false);
   };
@@ -117,7 +138,7 @@ export default function App() {
       <main className="flex-grow">
         {currentPage === 'home' && (
           <HomePage
-            properties={properties}
+            properties={publishedProperties}
             navigateTo={navigateTo}
             wishlist={wishlist}
             toggleWishlist={toggleWishlist}
@@ -127,19 +148,19 @@ export default function App() {
         )}
 
         {currentPage === 'land' && (
-          <DirectoryPage type="land" properties={properties.filter((p) => p.type === 'land')} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
+          <DirectoryPage type="land" properties={publishedProperties.filter((p) => p.type === 'land')} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
         )}
 
         {currentPage === 'flat' && (
-          <DirectoryPage type="flat" properties={properties.filter((p) => p.type === 'flat')} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
+          <DirectoryPage type="flat" properties={publishedProperties.filter((p) => p.type === 'flat')} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
         )}
 
         {currentPage === 'area' && (
-          <DirectoryPage type="all" properties={properties} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
+          <DirectoryPage type="all" properties={publishedProperties} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} searchFilters={searchFilters} />
         )}
 
         {currentPage === 'details' && selectedProperty && (
-          <PropertyDetailsPage property={selectedProperty} properties={properties} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} />
+          <PropertyDetailsPage property={selectedProperty} properties={publishedProperties} navigateTo={navigateTo} wishlist={wishlist} toggleWishlist={toggleWishlist} />
         )}
 
         {currentPage === 'submit' && <SubmitPropertyPage navigateTo={navigateTo} />}
@@ -148,11 +169,12 @@ export default function App() {
         {currentPage === 'privacy' && <PrivacyPolicyPage />}
         {currentPage === 'terms' && <TermsPage />}
         {currentPage === 'wishlist' && (
-          <WishlistPage properties={properties.filter((p) => wishlist.includes(p.id))} navigateTo={navigateTo} toggleWishlist={toggleWishlist} />
+          <WishlistPage properties={publishedProperties.filter((p) => wishlist.includes(p.id))} navigateTo={navigateTo} toggleWishlist={toggleWishlist} />
         )}
         {currentPage === 'admin' && (
           <AdminCRM
             properties={properties}
+            setProperties={setProperties}
             isLoggedIn={isAdminLoggedIn}
             setIsLoggedIn={setIsAdminLoggedIn}
             pin={adminPin}
@@ -241,4 +263,4 @@ export default function App() {
       </div>
     </div>
   );
-}
+} 
