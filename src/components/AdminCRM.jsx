@@ -7,6 +7,7 @@ import {
   Pencil,
   PlusCircle,
   Trash2,
+  Search,
   Upload,
   X,
   UserRound,
@@ -78,6 +79,19 @@ const leads = [
   },
 ];
 const statuses = ["Published", "Pending", "Sold"];
+const normalizeSearch = (value) => String(value ?? "").toLowerCase().trim();
+const normalizePhone = (value) => String(value ?? "").replace(/\D/g, "");
+function createPropertyId(properties, type) {
+  const prefix = type === "land" ? "LF-BRL-" : "LF-BRF-";
+  const usedIds = new Set(properties.map((property) => property.propertyId));
+  let sequence = 1;
+  let propertyId = `${prefix}${String(sequence).padStart(3, "0")}`;
+  while (usedIds.has(propertyId)) {
+    sequence += 1;
+    propertyId = `${prefix}${String(sequence).padStart(3, "0")}`;
+  }
+  return propertyId;
+}
 const transactions = [
   {
     id: "TXN-2026-001",
@@ -144,6 +158,7 @@ const transactions = [
 export default function AdminCRM({
   properties,
   setProperties,
+  navigateTo,
   isLoggedIn,
   setIsLoggedIn,
   pin,
@@ -153,6 +168,9 @@ export default function AdminCRM({
   const [leadRecords, setLeadRecords] = useState(leads);
   const [editingProperty, setEditingProperty] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [previewProperty, setPreviewProperty] = useState(null);
+  const [selectedAdminProperty, setSelectedAdminProperty] = useState(null);
   if (!isLoggedIn)
     return (
       <div className="max-w-md mx-auto my-12 p-6 bg-white border rounded-xl text-center">
@@ -215,25 +233,45 @@ export default function AdminCRM({
   if (selectedLocation) {
     return <LocationDetailsPage location={selectedLocation} properties={properties} leads={leadRecords} onBack={() => setSelectedLocation(null)} />;
   }
+  if (selectedAdminProperty) {
+    return (
+      <AdminPropertyDetails
+        property={selectedAdminProperty}
+        properties={properties}
+        onBack={() => setSelectedAdminProperty(null)}
+        onEdit={() => {
+          setSelectedAdminProperty(null);
+          setTab("inventory");
+          setEditingProperty(selectedAdminProperty);
+        }}
+        onWebsite={() => navigateTo("details", selectedAdminProperty)}
+      />
+    );
+  }
   const saveProperty = (property) => {
+    const isNewProperty = !property.id;
+    const savedProperty = {
+      ...property,
+      ...(isNewProperty ? {
+        id: `property-${Date.now()}`,
+        propertyId: createPropertyId(properties, property.type),
+        status: "Pending",
+        published: false,
+        verificationStatus: "Pending",
+        createdAt: new Date().toISOString().slice(0, 10),
+      } : {}),
+    };
     setProperties((current) =>
-      property.id
-        ? current.map((item) => (item.id === property.id ? property : item))
-        : [
-            {
-              ...property,
-              id: `property-${Date.now()}`,
-              propertyId: `LF-${property.type === "land" ? "BRL" : "BRF"}-${String(current.length + 1).padStart(3, "0")}`,
-              createdAt: new Date().toISOString().slice(0, 10),
-            },
-            ...current,
-          ],
+      isNewProperty
+        ? [savedProperty, ...current]
+        : current.map((item) => (item.id === savedProperty.id ? savedProperty : item)),
     );
     setEditingProperty(null);
+    if (isNewProperty) setPreviewProperty(savedProperty);
   };
   return (
-    <div className="max-w-[1440px] mx-auto px-4 py-6">
-      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+    <div className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4 sm:py-6">
+      <header className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
         <div>
           <p className="text-xs font-bold uppercase tracking-widest text-[#00875A]">
             Land&Flat CRM
@@ -249,12 +287,12 @@ export default function AdminCRM({
           লগআউট
         </button>
       </header>
-      <div className="grid lg:grid-cols-[230px_minmax(0,1fr)] gap-6 items-start">
-        <aside className="bg-white rounded-xl border border-gray-200 p-3 lg:sticky lg:top-24">
+      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-6">
+        <aside className="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white p-2.5 lg:sticky lg:top-24 lg:p-3">
           <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
             Admin options
           </p>
-          <nav className="flex lg:flex-col gap-2 overflow-x-auto">
+          <nav className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:pb-0">
             <SideNavButton
               active={tab === "inventory" && editingProperty !== "new"}
               icon={LayoutDashboard}
@@ -274,6 +312,17 @@ export default function AdminCRM({
               }}
             >
               নতুন listing
+            </SideNavButton>
+            <SideNavButton
+              active={tab === "previews"}
+              icon={Eye}
+              className="lg:ml-3"
+              onClick={() => {
+                setTab("previews");
+                setEditingProperty(null);
+              }}
+            >
+              Preview
             </SideNavButton>
             <SideNavButton
               active={tab === "sellers"}
@@ -308,7 +357,15 @@ export default function AdminCRM({
           </nav>
         </aside>
         <section className="min-w-0">
-          <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <AdminSearch
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            properties={properties}
+            onOpenProperty={setSelectedAdminProperty}
+            onOpenLead={() => setTab("leads")}
+            onOpenSeller={() => setTab("sellers")}
+          />
+          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:mb-6 xl:grid-cols-4 xl:gap-4">
             <SummaryCard
               label="মোট প্রপার্টি"
               value={properties.length}
@@ -341,6 +398,7 @@ export default function AdminCRM({
                   property={editingProperty === "new" ? null : editingProperty}
                   onSave={saveProperty}
                   onCancel={() => setEditingProperty(null)}
+                  navigateTo={navigateTo}
                 />
               )}
               <InventoryTable
@@ -349,8 +407,19 @@ export default function AdminCRM({
                 deleteProperty={deleteProperty}
                 editProperty={setEditingProperty}
                 onLocationSelect={setSelectedLocation}
+                onPreviewProperty={setPreviewProperty}
               />
             </>
+          )}
+          {tab === "previews" && (
+            <PreviewQueue
+              properties={properties}
+              onPreview={setPreviewProperty}
+              onEdit={(property) => {
+                setTab("inventory");
+                setEditingProperty(property);
+              }}
+            />
           )}
           {tab === "sellers" && <SellerTable />}
           {tab === "leads" && (
@@ -359,6 +428,22 @@ export default function AdminCRM({
           {tab === "finance" && <FinanceTable />}
         </section>
       </div>
+      {previewProperty && (
+        <PropertyApprovalPreview
+          property={previewProperty}
+          onClose={() => setPreviewProperty(null)}
+          onEdit={() => {
+            setPreviewProperty(null);
+            setEditingProperty(previewProperty);
+          }}
+          onApprove={() => {
+            setProperties((current) => current.map((item) => item.id === previewProperty.id
+              ? { ...item, status: "Published", published: true, verificationStatus: "Verified" }
+              : item));
+            setPreviewProperty(null);
+          }}
+        />
+      )}
     </div>
   );
 }
@@ -376,18 +461,137 @@ function SummaryCard({ label, value, icon: Icon, color }) {
     </div>
   );
 }
-function SideNavButton({ active, icon: Icon, onClick, children }) {
+
+function AdminPropertyDetails({ property, properties, onBack, onEdit, onWebsite }) {
+  const propertyIndex = properties.findIndex((item) => item.id === property.id);
+  const fallbackSeller = sellers[(propertyIndex < 0 ? 0 : propertyIndex) % sellers.length];
+  const sellerName = property.ownerName || fallbackSeller.name;
+  const sellerPhone = property.ownerPhone || fallbackSeller.phone;
+  const statusLabel = property.status === "Published" ? "Published" : property.status || "Pending";
+
+  return (
+    <div className="min-h-[60vh] rounded-xl bg-slate-50 p-3 sm:p-6">
+      <div className="mx-auto max-w-3xl">
+        <button type="button" onClick={onBack} className="mb-4 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#00875A] hover:text-[#00875A]">← Search-এ ফিরে যান</button>
+        <section className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+          <div className="border-b border-gray-100 pb-4">
+            <p className="text-xs font-bold uppercase tracking-widest text-[#00875A]">Property details</p>
+            <h1 className="mt-2 text-xl font-extrabold text-gray-900 sm:text-2xl">{property.title}</h1>
+            <p className="mt-1 text-sm text-gray-500">{property.location}</p>
+          </div>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            <AdminDetailItem label="Property ID" value={property.propertyId} highlight />
+            <AdminDetailItem label="Status" value={statusLabel} />
+            <AdminDetailItem label="Seller name" value={sellerName} />
+            <AdminDetailItem label="Seller number" value={sellerPhone} />
+            <AdminDetailItem label="Type" value={property.type === "land" ? "জমি" : "ফ্ল্যাট"} />
+            <AdminDetailItem label="Price" value={property.formattedPrice || `৳ ${Number(property.price || 0).toLocaleString("en-IN")}`} />
+          </div>
+          <div className="mt-4 rounded-lg bg-slate-50 p-4">
+            <p className="text-xs font-bold text-gray-500">Description</p>
+            <p className="mt-1 text-sm leading-6 text-gray-700">{property.description || "তথ্য পাওয়া যায়নি"}</p>
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
+            <button type="button" onClick={onEdit} className="rounded-lg bg-[#00875A] px-4 py-2.5 text-sm font-bold text-white">Edit</button>
+            <button type="button" onClick={onWebsite} className="rounded-lg border border-[#00875A] px-4 py-2.5 text-sm font-bold text-[#00875A]">Website</button>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function AdminDetailItem({ label, value, highlight = false }) {
+  return (
+    <div className="rounded-lg border border-gray-100 bg-slate-50 p-3">
+      <p className="text-xs text-gray-500">{label}</p>
+      <p className={`mt-1 text-sm font-bold ${highlight ? "text-[#00875A]" : "text-gray-900"}`}>{value || "তথ্য পাওয়া যায়নি"}</p>
+    </div>
+  );
+}
+
+function AdminSearch({ searchTerm, setSearchTerm, properties, onOpenProperty, onOpenLead, onOpenSeller }) {
+  const query = normalizeSearch(searchTerm);
+  const phoneQuery = normalizePhone(searchTerm);
+  const matchesText = (values) => values.some((value) => normalizeSearch(value).includes(query));
+  const matchesPhone = (value) => phoneQuery.length > 0 && normalizePhone(value).includes(phoneQuery);
+  const propertyResults = query
+    ? properties.filter((property) =>
+      matchesText([
+        property.propertyId,
+        property.title,
+        property.location,
+        property.area,
+        property.ownerName,
+        property.ownerPhone,
+        property.developer,
+        property.projectName,
+      ]) || matchesPhone(property.ownerPhone))
+    : [];
+  const leadResults = query
+    ? leads.filter((lead) => matchesText([lead.id, lead.name, lead.property, lead.area]) || matchesPhone(lead.phone))
+    : [];
+  const sellerResults = query
+    ? sellers.filter((seller) => matchesText([seller.id, seller.name, seller.email, seller.type]) || matchesPhone(seller.phone))
+    : [];
+  const hasResults = propertyResults.length + leadResults.length + sellerResults.length > 0;
+
+  return (
+    <section className="mb-5 rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-4">
+      <label className="flex items-center gap-2 text-sm font-bold text-gray-700">
+        <Search className="h-4 w-4 shrink-0 text-[#00875A]" />
+        <span className="sr-only">প্রপার্টি, ক্লায়েন্ট বা সেলার সার্চ</span>
+        <input
+          value={searchTerm}
+          onChange={(event) => setSearchTerm(event.target.value)}
+          placeholder="Property ID, ক্লায়েন্ট বা সেলারের মোবাইল নম্বর দিয়ে খুঁজুন"
+          className="min-w-0 flex-1 rounded-lg border border-gray-300 px-3 py-2.5 text-sm font-normal outline-none focus:border-[#00875A] focus:ring-2 focus:ring-[#00875A]/10"
+        />
+      </label>
+      {query && (
+        <div className="mt-3 space-y-2">
+          {!hasResults && <p className="rounded-lg bg-slate-50 p-3 text-xs text-gray-500">কোনো property, client বা seller পাওয়া যায়নি।</p>}
+          {propertyResults.map((property) => (
+            <button type="button" key={property.id} onClick={() => onOpenProperty(property)} className="w-full rounded-lg border border-emerald-100 bg-emerald-50/50 p-3 text-left transition hover:border-[#00875A]">
+              <div className="min-w-0">
+                <p className="text-xs font-extrabold text-[#00875A]">{property.propertyId}</p>
+                <p className="truncate text-sm font-bold text-gray-900">{property.title}</p>
+                <p className="text-xs text-gray-500">{property.location} · {property.ownerPhone || property.developer || "সেলার তথ্য নেই"}</p>
+              </div>
+            </button>
+          ))}
+          {leadResults.map((lead) => (
+            <button type="button" key={lead.id} onClick={onOpenLead} className="w-full rounded-lg border border-blue-100 bg-blue-50/50 p-3 text-left hover:border-blue-400">
+              <p className="text-xs font-extrabold text-blue-700">ক্লায়েন্ট · {lead.id}</p>
+              <p className="text-sm font-bold text-gray-900">{lead.name} · {lead.phone}</p>
+              <p className="text-xs text-gray-500">Property: {lead.property} · এলাকা: {lead.area} · স্ট্যাটাস: {lead.status}</p>
+            </button>
+          ))}
+          {sellerResults.map((seller) => (
+            <button type="button" key={seller.id} onClick={onOpenSeller} className="w-full rounded-lg border border-amber-100 bg-amber-50/60 p-3 text-left hover:border-amber-400">
+              <p className="text-xs font-extrabold text-amber-700">সেলার · {seller.id}</p>
+              <p className="text-sm font-bold text-gray-900">{seller.name} · {seller.phone}</p>
+              <p className="text-xs text-gray-500">{seller.type} · {seller.email} · NID: {seller.nid}</p>
+            </button>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function SideNavButton({ active, icon: Icon, onClick, children, className = "" }) {
   return (
     <button
       onClick={onClick}
-      className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-bold transition lg:w-full ${active ? "bg-[#00875A] text-white shadow-sm" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`}
+      className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2.5 text-left text-sm font-bold transition lg:w-full ${className} ${active ? "bg-[#00875A] text-white shadow-sm" : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"}`}
     >
       <Icon className="w-4 h-4" />
       {children}
     </button>
   );
 }
-function PropertyEditor({ property, onSave, onCancel }) {
+function PropertyEditor({ property, onSave, onCancel, navigateTo }) {
   const [form, setForm] = useState(() => property ? { leadCount: 0, viewCount: 0, ...property } : {
     type: "land",
     title: "",
@@ -398,22 +602,25 @@ function PropertyEditor({ property, onSave, onCancel }) {
     formattedPrice: "",
     landSize: "",
     flatSize: "",
-    image: "",
+    images: [],
     video: "",
     leadCount: 0,
     viewCount: 0,
     status: "Published",
   });
   const update = (field, value) => setForm((current) => ({ ...current, [field]: value }));
-  const readUpload = (field, file) => {
-    if (!file) return;
+  const readUpload = (field, files) => {
+    const selectedFiles = Array.from(files || []);
+    if (selectedFiles.length === 0) return;
     if (field === "video") {
-      update(field, URL.createObjectURL(file));
+      update(field, URL.createObjectURL(selectedFiles[0]));
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => update(field, reader.result);
-    reader.readAsDataURL(file);
+    Promise.all(selectedFiles.slice(0, 3).map((file) => new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.readAsDataURL(file);
+    }))).then((images) => update("images", images));
   };
   const submit = (event) => {
     event.preventDefault();
@@ -427,15 +634,15 @@ function PropertyEditor({ property, onSave, onCancel }) {
       description: form.description || form.title,
       verificationStatus: property?.verificationStatus || "Pending",
       published: form.status === "Published",
-      images: form.image ? [form.image] : property?.images || ["https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80"],
+      images: (form.images || property?.images || []).slice(0, 3),
       video: form.video || property?.video || "",
       leadCount: Math.max(0, Number(form.leadCount) || 0),
       viewCount: Math.max(0, Number(form.viewCount) || 0),
     });
   };
   return (
-    <form onSubmit={submit} className="mb-6 rounded-xl border border-[#00875A]/30 bg-white p-5 shadow-sm">
-      <div className="mb-4 flex items-center justify-between"><div><h2 className="text-lg font-bold text-gray-900">{property ? "প্রপার্টি এডিট করুন" : "নতুন প্রপার্টি যোগ করুন"}</h2><p className="text-xs text-gray-500">Admin থেকে website listing আপডেট করুন</p></div><button type="button" onClick={onCancel} className="text-sm font-bold text-gray-500">বন্ধ করুন</button></div>
+    <form onSubmit={submit} className="mb-5 rounded-xl border border-[#00875A]/30 bg-white p-3 shadow-sm sm:mb-6 sm:p-5">
+      <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between"><div><h2 className="text-lg font-bold text-gray-900">{property ? "প্রপার্টি এডিট করুন" : "নতুন প্রপার্টি যোগ করুন"}</h2><p className="text-xs text-gray-500">Admin থেকে website listing আপডেট করুন</p></div><button type="button" onClick={onCancel} className="self-start text-sm font-bold text-gray-500">বন্ধ করুন</button></div>
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="text-xs font-bold text-gray-600">টাইপ<select value={form.type} onChange={(event) => update("type", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 p-2.5"><option value="land">জমি</option><option value="flat">ফ্ল্যাট</option></select></label>
         <label className="text-xs font-bold text-gray-600">স্ট্যাটাস<select value={form.status} onChange={(event) => update("status", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 p-2.5"><option value="Published">Published</option><option value="Pending">Pending</option><option value="Sold">Sold</option></select></label>
@@ -445,16 +652,62 @@ function PropertyEditor({ property, onSave, onCancel }) {
         <label className="text-xs font-bold text-gray-600">মূল্য<input required type="number" value={form.price} onChange={(event) => update("price", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 p-2.5" /></label>
         <label className="text-xs font-bold text-gray-600">লিড সংখ্যা<input min="0" type="number" value={form.leadCount} onChange={(event) => update("leadCount", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 p-2.5" /></label>
         <label className="text-xs font-bold text-gray-600">ভিউ সংখ্যা<input min="0" type="number" value={form.viewCount} onChange={(event) => update("viewCount", event.target.value)} className="mt-1 w-full rounded-lg border border-gray-300 p-2.5" /></label>
-        <label className="text-xs font-bold text-gray-600">প্রপার্টির ছবি<label className="mt-1 flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 p-2.5 text-gray-500 hover:border-[#00875A] hover:text-[#00875A]"><Upload className="h-4 w-4" /><span className="truncate">{form.image ? "ছবি নির্বাচিত" : "ছবি আপলোড করুন"}</span><input type="file" accept="image/*" onChange={(event) => readUpload("image", event.target.files?.[0])} className="sr-only" /></label></label>
-        <label className="text-xs font-bold text-gray-600">প্রপার্টি ভিডিও<label className="mt-1 flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 p-2.5 text-gray-500 hover:border-[#00875A] hover:text-[#00875A]"><Upload className="h-4 w-4" /><span className="truncate">{form.video ? "ভিডিও নির্বাচিত" : "ভিডিও আপলোড করুন"}</span><input type="file" accept="video/*" onChange={(event) => readUpload("video", event.target.files?.[0])} className="sr-only" /></label></label>
+        <label className="text-xs font-bold text-gray-600">প্রপার্টির ছবি<label className="mt-1 flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 p-2.5 text-gray-500 hover:border-[#00875A] hover:text-[#00875A]"><Upload className="h-4 w-4" /><span className="truncate">{form.images?.length ? `${form.images.length}টি ছবি নির্বাচিত` : "সর্বোচ্চ ৩টি ছবি আপলোড করুন"}</span><input type="file" accept="image/*" multiple onChange={(event) => readUpload("image", event.target.files)} className="sr-only" /></label></label>
+        <label className="text-xs font-bold text-gray-600">প্রপার্টি ভিডিও<label className="mt-1 flex cursor-pointer items-center gap-2 rounded-lg border border-dashed border-gray-300 p-2.5 text-gray-500 hover:border-[#00875A] hover:text-[#00875A]"><Upload className="h-4 w-4" /><span className="truncate">{form.video ? "ভিডিও নির্বাচিত" : "সর্বোচ্চ ১টি ভিডিও আপলোড করুন"}</span><input type="file" accept="video/*" onChange={(event) => readUpload("video", event.target.files)} className="sr-only" /></label></label>
         <label className="text-xs font-bold text-gray-600 sm:col-span-2">বিবরণ<textarea value={form.description} onChange={(event) => update("description", event.target.value)} rows="3" className="mt-1 w-full rounded-lg border border-gray-300 p-2.5" /></label>
       </div>
-      <div className="mt-4 flex gap-2"><button type="submit" className="rounded-lg bg-[#00875A] px-4 py-2 text-sm font-bold text-white">Save listing</button><button type="button" onClick={onCancel} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-600">Cancel</button></div>
+      <div className="mt-4 flex flex-wrap gap-2"><button type="submit" className="rounded-lg bg-[#00875A] px-4 py-2 text-sm font-bold text-white">Save listing</button><button type="button" onClick={onCancel} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-600">Cancel</button>{property && property.status === "Published" && <button type="button" onClick={() => navigateTo("details", property)} className="rounded-lg border border-[#00875A] px-4 py-2 text-sm font-bold text-[#00875A]">Website এ দেখুন</button>}</div>
     </form>
   );
 }
 
-function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty, onLocationSelect }) {
+function PropertyApprovalPreview({ property, onClose, onEdit, onApprove }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-3 sm:items-center sm:p-5">
+      <div className="my-3 w-full max-w-4xl rounded-2xl bg-slate-50 shadow-2xl sm:my-0">
+        <div className="flex items-start justify-between gap-4">
+          <div className="w-full rounded-t-2xl bg-white p-4 sm:p-6">
+            <p className="text-xs font-bold uppercase tracking-widest text-amber-600">Preview · Pending approval</p>
+            <h2 className="mt-1 text-xl font-extrabold text-gray-900">{property.title}</h2>
+            <p className="mt-1 text-xs text-gray-500">{property.propertyId} · {property.location}</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="বন্ধ করুন" className="mr-3 mt-3 rounded-lg p-2 text-gray-500 hover:bg-gray-100 sm:mr-5"><X className="h-5 w-5" /></button>
+        </div>
+        <div className="max-h-[75vh] overflow-y-auto p-3 sm:p-6">
+          <div className="rounded-xl bg-white p-4 shadow-sm sm:p-6">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded bg-emerald-100 px-2 py-1 text-[10px] font-bold text-[#00875A]">{property.propertyId}</span>
+              <span className="rounded bg-amber-100 px-2 py-1 text-[10px] font-bold text-amber-700">Pending approval</span>
+            </div>
+            <p className="mt-2 text-sm text-[#00875A]">{property.location}</p>
+            <div className="mt-4 flex flex-wrap items-end gap-x-8 gap-y-3 border-t border-gray-100 pt-4">
+              <div><p className="text-xs text-gray-400">মোট মূল্য</p><p className="text-2xl font-extrabold text-[#00875A]">{property.formattedPrice}</p></div>
+              <div><p className="text-xs text-gray-400">ধরণ</p><p className="text-sm font-bold text-gray-800">{property.type === "land" ? "জমি" : "ফ্ল্যাট"}</p></div>
+              <div><p className="text-xs text-gray-400">আয়তন</p><p className="text-sm font-bold text-gray-800">{property.type === "land" ? property.landSize : property.flatSize}</p></div>
+            </div>
+          </div>
+          {((property.images || []).length > 0 || property.video) && <div className="mt-5 rounded-xl bg-white p-4 shadow-sm sm:p-6">
+            <h3 className="mb-3 font-bold text-gray-900">ছবি ও ভিডিও</h3>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {(property.images || []).slice(0, 3).map((image) => <img key={image} src={image} alt={property.title} className="h-52 w-full rounded-lg object-cover" />)}
+              {property.video && <video src={property.video} controls className="h-52 w-full rounded-lg bg-gray-100 object-cover" />}
+            </div>
+          </div>}
+          <div className="mt-5 rounded-xl bg-white p-4 shadow-sm sm:p-6">
+            <h3 className="mb-3 font-bold text-gray-900">বিস্তারিত বিবরণ</h3>
+            <p className="text-sm leading-7 text-gray-600">{property.description || "তথ্য পাওয়া যায়নি"}</p>
+          </div>
+        </div>
+        <div className="flex flex-wrap justify-end gap-2 rounded-b-2xl bg-white p-4 sm:p-6">
+          <button type="button" onClick={onEdit} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-bold text-gray-700">এডিট করুন</button>
+          <button type="button" onClick={onApprove} className="rounded-lg bg-[#00875A] px-4 py-2 text-sm font-bold text-white">Approve &amp; publish</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty, onLocationSelect, onPreviewProperty }) {
   const [locationFilter, setLocationFilter] = useState("all");
   const locations = [...new Set(inventory.map((property) => property.location))];
   const filteredInventory = inventory.filter((property) => locationFilter === "all" || property.location === locationFilter);
@@ -472,9 +725,9 @@ function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty,
         </div>
       </div>
       <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <label className="text-xs font-bold text-gray-600">
+        <label className="flex min-w-0 flex-col gap-1 text-xs font-bold text-gray-600 sm:flex-row sm:items-center sm:gap-2">
           লোকেশন দিয়ে ফিল্টার
-          <select value={locationFilter} onChange={(event) => setLocationFilter(event.target.value)} className="ml-2 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-normal text-gray-700">
+          <select value={locationFilter} onChange={(event) => setLocationFilter(event.target.value)} className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-normal text-gray-700 sm:w-auto">
             <option value="all">সব লোকেশন</option>
             {locations.map((location) => <option key={location} value={location}>{location}</option>)}
           </select>
@@ -486,6 +739,7 @@ function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty,
           <thead className="bg-slate-50 text-gray-500">
             <tr>
               {[
+                "Property ID",
                 "লোকেশন",
                 "লিড",
                 "ভিউ",
@@ -505,6 +759,7 @@ function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty,
                 onClick={() => onLocationSelect(property.location)}
                 className="cursor-pointer border-t border-gray-100 align-top transition hover:bg-emerald-50/50"
               >
+                <td className="p-4 font-bold text-[#00875A]">{property.propertyId}</td>
                 <td className="p-4 text-gray-600">{property.location}</td>
                 <td className="p-4 font-bold">{property.leadCount || 0}</td>
                 <td className="p-4">
@@ -533,6 +788,12 @@ function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty,
                       বিস্তারিত দেখুন
                     </button>
                     <button
+                      onClick={(event) => { event.stopPropagation(); onPreviewProperty(property); }}
+                      className="rounded-lg bg-amber-50 px-3 py-2 text-xs font-bold text-amber-700"
+                    >
+                      Preview
+                    </button>
+                    <button
                       onClick={(event) => { event.stopPropagation(); editProperty(property); }}
                       aria-label="সম্পাদনা"
                       className="p-2 rounded-lg bg-blue-50 text-blue-600"
@@ -558,16 +819,54 @@ function InventoryTable({ inventory, changeStatus, deleteProperty, editProperty,
   );
 }
 
+function PreviewQueue({ properties, onPreview, onEdit }) {
+  const pendingProperties = properties.filter((property) => property.status === "Pending");
+
+  return (
+    <section>
+      <div className="mb-4">
+        <h2 className="text-xl font-bold text-gray-900">Preview queue</h2>
+        <p className="mt-1 text-xs text-gray-500">নতুন listing approve করার আগে website-এর মতো preview দেখুন</p>
+      </div>
+      {pendingProperties.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">কোনো pending listing নেই।</div>
+      ) : (
+        <div className="space-y-3">
+          {pendingProperties.map((property, index) => (
+            <article key={property.id} className="rounded-xl border border-amber-100 bg-white p-4 shadow-sm">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div className="flex min-w-0 items-start gap-3">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-100 text-sm font-extrabold text-amber-700">{index + 1}</span>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-[#00875A]">{property.propertyId}</p>
+                    <h3 className="truncate text-sm font-bold text-gray-900">{property.title}</h3>
+                    <p className="mt-1 text-xs text-gray-500">{property.location} · {property.ownerName || "সেলার তথ্য যোগ করা হয়নি"}</p>
+                  </div>
+                </div>
+                <span className="rounded-full bg-amber-100 px-2.5 py-1 text-[10px] font-bold text-amber-700">Pending approval</span>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2 border-t border-gray-100 pt-3">
+                <button type="button" onClick={() => onPreview(property)} className="rounded-lg bg-[#00875A] px-3 py-2 text-xs font-bold text-white">Preview</button>
+                <button type="button" onClick={() => onEdit(property)} className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-bold text-gray-700">Edit</button>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
 function LocationDetailsPage({ location, properties, leads, onBack }) {
   const landProperties = properties.filter((property) => property.location === location && property.type === "land");
   const locationLeads = leads.filter((lead) => location.includes(lead.area) || lead.area.includes(location));
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen min-w-0 bg-slate-50 px-3 py-4 sm:px-6 sm:py-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
-        <button onClick={onBack} className="mb-5 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-bold text-gray-700 hover:border-[#00875A] hover:text-[#00875A]">← ইনভেন্টরিতে ফিরে যান</button>
-        <header className="mb-6 rounded-2xl bg-white p-6 shadow-sm"><p className="text-xs font-bold uppercase tracking-widest text-[#00875A]">Location details</p><h1 className="mt-2 text-2xl font-extrabold text-gray-900">{location}</h1><p className="mt-1 text-sm text-gray-500">এই লোকেশনের {landProperties.length} টি জমি এবং {locationLeads.length} টি lead</p></header>
+        <button onClick={onBack} className="mb-4 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-bold text-gray-700 hover:border-[#00875A] hover:text-[#00875A] sm:mb-5 sm:px-4">← ইনভেন্টরিতে ফিরে যান</button>
+        <header className="mb-5 rounded-2xl bg-white p-4 shadow-sm sm:mb-6 sm:p-6"><p className="text-xs font-bold uppercase tracking-widest text-[#00875A]">Location details</p><h1 className="mt-2 break-words text-2xl font-extrabold text-gray-900">{location}</h1><p className="mt-1 text-sm text-gray-500">এই লোকেশনের {landProperties.length} টি জমি এবং {locationLeads.length} টি lead</p></header>
         <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"><div className="border-b border-gray-200 bg-slate-50 px-5 py-4"><h2 className="font-bold text-gray-900">জমির তালিকা</h2></div><div className="overflow-x-auto"><table className="w-full min-w-[900px] text-left text-xs"><thead className="bg-white text-gray-500"><tr>{["SL", "প্রপার্টি হেডিং", "সেলারের নাম", "যোগাযোগ নম্বর", "স্ট্যাটাস", "জমির পরিমাণ", "জমির ধরন"].map((heading) => <th key={heading} className="border-b border-gray-200 px-5 py-4 font-bold">{heading}</th>)}</tr></thead><tbody>{landProperties.map((property, index) => { const seller = sellers[index % sellers.length]; return <tr key={property.id} className="border-b border-gray-100 hover:bg-emerald-50/40"><td className="px-5 py-4 font-bold text-[#00875A]">{index + 1}</td><td className="px-5 py-4"><strong className="block text-gray-900">{property.title}</strong><span className="text-[10px] text-gray-400">{property.propertyId} · {property.formattedPrice}</span></td><td className="px-5 py-4 font-semibold text-gray-800">{property.ownerName || seller.name}</td><td className="px-5 py-4"><a href={`tel:${property.ownerPhone || seller.phone}`} className="text-[#00875A]">{property.ownerPhone || seller.phone}</a></td><td className="px-5 py-4"><StatusBadge status={property.status} /></td><td className="px-5 py-4 font-semibold">{property.landSize || "তথ্য নেই"}</td><td className="px-5 py-4 text-gray-600">{property.landCategory === "Commercial" ? "বাণিজ্যিক" : "আবাসিক"}</td></tr>; })}</tbody></table>{landProperties.length === 0 && <p className="p-10 text-center text-sm text-gray-500">এই লোকেশনে কোনো জমির listing নেই।</p>}</div></section>
-        <section className="mt-6 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"><div className="mb-4 flex items-center justify-between"><h2 className="font-bold text-gray-900">এই লোকেশনের লিড</h2><span className="text-xs text-gray-500">{locationLeads.length} টি lead</span></div>{locationLeads.length > 0 ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{locationLeads.map((lead) => <article key={lead.id} className="rounded-xl border border-gray-200 bg-slate-50 p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="font-bold text-gray-900">{lead.name}</h3><a href={`tel:${lead.phone}`} className="text-xs text-[#00875A]">{lead.phone}</a></div><span className="rounded-full bg-blue-100 px-2 py-1 text-[10px] font-bold text-blue-700">{lead.status}</span></div><p className="mt-3 text-xs text-gray-600">প্রপার্টি: {lead.property}</p><p className="mt-1 text-xs text-gray-600">বাজেট: {lead.budget}</p><p className="mt-2 text-xs text-gray-600">নোট: {lead.note}</p>{lead.lastFollowUpDate && <p className="mt-2 text-[11px] font-semibold text-[#00875A]">শেষ follow-up: {lead.lastFollowUpDate}</p>}</article>)}</div> : <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-gray-500">এই লোকেশনে কোনো lead পাওয়া যায়নি।</p>}</section>
+        <section className="mt-5 rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:mt-6 sm:p-5"><div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="font-bold text-gray-900">এই লোকেশনের লিড</h2><span className="text-xs text-gray-500">{locationLeads.length} টি lead</span></div>{locationLeads.length > 0 ? <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">{locationLeads.map((lead) => <article key={lead.id} className="rounded-xl border border-gray-200 bg-slate-50 p-4"><div className="flex items-start justify-between gap-3"><div><h3 className="font-bold text-gray-900">{lead.name}</h3><a href={`tel:${lead.phone}`} className="text-xs text-[#00875A]">{lead.phone}</a></div><span className="rounded-full bg-blue-100 px-2 py-1 text-[10px] font-bold text-blue-700">{lead.status}</span></div><p className="mt-3 text-xs text-gray-600">প্রপার্টি: {lead.property}</p><p className="mt-1 text-xs text-gray-600">বাজেট: {lead.budget}</p><p className="mt-2 text-xs text-gray-600">নোট: {lead.note}</p>{lead.lastFollowUpDate && <p className="mt-2 text-[11px] font-semibold text-[#00875A]">শেষ follow-up: {lead.lastFollowUpDate}</p>}</article>)}</div> : <p className="rounded-xl bg-slate-50 p-6 text-center text-sm text-gray-500">এই লোকেশনে কোনো lead পাওয়া যায়নি।</p>}</section>
       </div>
     </div>
   );
@@ -578,8 +877,8 @@ function StatusBadge({ status }) { return <span className={`rounded-full px-2 py
 export function LocationPropertiesPreview({ location, properties, leads, onClose }) {
   const landProperties = properties.filter((property) => property.type === "land");
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" onClick={onClose}>
-      <div className="max-h-[90vh] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-5 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-2 sm:items-center sm:p-4" onClick={onClose}>
+      <div className="my-2 max-h-[calc(100vh-1rem)] w-full max-w-4xl overflow-y-auto rounded-2xl bg-white p-3 shadow-2xl sm:my-0 sm:max-h-[90vh] sm:p-5" onClick={(event) => event.stopPropagation()}>
         <div className="mb-5 flex items-start justify-between gap-4"><div><p className="text-xs font-bold text-[#00875A]">লোকেশন</p><h3 className="mt-1 text-xl font-bold text-gray-900">{location}</h3><p className="text-xs text-gray-500">এই লোকেশনের {landProperties.length} টি জমি</p></div><button onClick={onClose} aria-label="বন্ধ করুন" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100"><X className="h-5 w-5" /></button></div>
         <section className="overflow-hidden rounded-xl border border-gray-200"><div className="border-b border-gray-200 bg-slate-50 px-4 py-3"><h4 className="font-bold text-gray-900">এই লোকেশনের জমির তালিকা</h4><p className="mt-1 text-xs text-gray-500">{landProperties.length} টি জমি পাওয়া গেছে</p></div><div className="overflow-x-auto"><table className="w-full min-w-[850px] text-left text-xs"><thead className="bg-white text-gray-500"><tr>{["SL", "প্রপার্টি হেডিং", "সেলারের নাম", "যোগাযোগ নম্বর", "স্ট্যাটাস", "জমির পরিমাণ", "জমির ধরন"].map((heading) => <th key={heading} className="border-b border-gray-200 px-4 py-3 font-bold">{heading}</th>)}</tr></thead><tbody>{landProperties.map((property, index) => { const seller = sellers[index % sellers.length]; return <tr key={property.id} className="border-b border-gray-100 align-top hover:bg-emerald-50/40"><td className="px-4 py-4 font-bold text-[#00875A]">{index + 1}</td><td className="px-4 py-4"><div className="flex items-center gap-3"><img src={property.images?.[0]} alt="" className="h-12 w-16 rounded-lg object-cover" /><div><strong className="block text-gray-900">{property.title}</strong><span className="text-[10px] text-gray-400">{property.propertyId} · {property.formattedPrice}</span></div></div></td><td className="px-4 py-4 font-semibold text-gray-800">{property.ownerName || seller.name}</td><td className="px-4 py-4"><a href={`tel:${property.ownerPhone || seller.phone}`} className="text-[#00875A]">{property.ownerPhone || seller.phone}</a></td><td className="px-4 py-4"><span className={`rounded-full px-2 py-1 font-bold ${property.status === "Published" ? "bg-emerald-100 text-[#00875A]" : property.status === "Sold" ? "bg-violet-100 text-violet-700" : "bg-amber-100 text-amber-700"}`}>{property.status === "Published" ? "Active" : property.status}</span></td><td className="px-4 py-4 font-semibold text-gray-800">{property.landSize || "তথ্য নেই"}</td><td className="px-4 py-4 text-gray-600">{property.landCategory === "Commercial" ? "বাণিজ্যিক" : "আবাসিক"}</td></tr>; })}</tbody></table>{landProperties.length === 0 && <p className="p-8 text-center text-sm text-gray-500">এই লোকেশনে কোনো জমির listing নেই।</p>}</div></section>
         <section className="mt-6"><div className="mb-3 flex items-center justify-between"><h4 className="text-lg font-bold text-gray-900">এই লোকেশনের লিড</h4><span className="text-xs text-gray-500">{leads.length} টি lead</span></div>{leads.length > 0 ? <div className="grid gap-3 sm:grid-cols-2">{leads.map((lead) => <article key={lead.id} className="rounded-xl border border-gray-200 bg-slate-50 p-4"><div className="flex items-start justify-between gap-3"><div><h5 className="font-bold text-gray-900">{lead.name}</h5><a href={`tel:${lead.phone}`} className="text-xs text-[#00875A]">{lead.phone}</a></div><span className="rounded-full bg-blue-100 px-2 py-1 text-[10px] font-bold text-blue-700">{lead.status}</span></div><p className="mt-3 text-xs text-gray-600">প্রপার্টি: {lead.property} · বাজেট: {lead.budget}</p><p className="mt-1 text-xs text-gray-600">নোট: {lead.note}</p>{lead.lastFollowUpDate && <p className="mt-2 text-[11px] font-semibold text-[#00875A]">শেষ follow-up: {lead.lastFollowUpDate}</p>}</article>)}</div> : <p className="rounded-xl bg-slate-50 p-5 text-center text-sm text-gray-500">এই লোকেশনে কোনো lead পাওয়া যায়নি।</p>}</section>
@@ -884,7 +1183,7 @@ function FinanceTable() {
           আয়, ব্যয় এবং প্রতিটি transaction-এর বর্তমান অবস্থা
         </p>
       </div>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:mb-6 lg:grid-cols-4 lg:gap-4">
         <SummaryCard
           label="মোট আয়"
           value={money(income)}

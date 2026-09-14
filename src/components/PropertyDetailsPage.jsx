@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CheckCircle2, FileCheck2, Heart, MapPin, Phone, PlayCircle, Share2 } from 'lucide-react';
+import { CheckCircle2, Copy, FileCheck2, Heart, MapPin, Phone, Share2 } from 'lucide-react';
 import PropertyCard from './PropertyCard';
 
 function InfoItem({ label, value }) {
@@ -13,6 +13,7 @@ function InfoItem({ label, value }) {
 
 export default function PropertyDetailsPage({ property, properties, navigateTo, wishlist, toggleWishlist }) {
   const [inquirySubmitted, setInquirySubmitted] = useState(false);
+  const [idCopied, setIdCopied] = useState(false);
   const relatedProperties = properties
     .filter((item) => item.id !== property.id && item.type === property.type)
     .slice(0, 3);
@@ -23,13 +24,23 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
     else if (navigator.clipboard) await navigator.clipboard.writeText(window.location.href);
   };
 
+  const copyPropertyId = async () => {
+    if (!property.propertyId || !navigator.clipboard) return;
+    await navigator.clipboard.writeText(property.propertyId);
+    setIdCopied(true);
+    window.setTimeout(() => setIdCopied(false), 1800);
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
       <section className="bg-white rounded-xl p-6 shadow-sm">
         <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-5">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="bg-emerald-100 text-[#00875A] text-[10px] font-bold px-2 py-1 rounded">{property.propertyId}</span>
+              <button type="button" onClick={copyPropertyId} className="flex items-center gap-1 rounded bg-emerald-100 px-2 py-1 text-[10px] font-bold text-[#00875A] hover:bg-emerald-200" title="Property ID copy করুন">
+                {idCopied ? 'কপি হয়েছে' : property.propertyId}
+                <Copy className="h-3 w-3" />
+              </button>
               {property.verificationStatus === 'Verified' && (
                 <span className="flex items-center gap-1 bg-emerald-50 text-[#00875A] text-[10px] font-bold px-2 py-1 rounded">
                   <CheckCircle2 className="w-3 h-3" /> ভেরিফাইড
@@ -60,18 +71,15 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
-          <div>
-            <h2 className="font-bold text-lg text-gray-900 mb-3">ছবি ও ভিজ্যুয়াল</h2>
+          {((property.images || []).length > 0 || property.video) && <div>
+            <h2 className="font-bold text-lg text-gray-900 mb-3">ছবি ও ভিডিও</h2>
             <section className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {property.images.map((image) => <img key={image} src={image} alt={property.title} className="w-full h-64 object-cover rounded-lg" />)}
-                <div className="min-h-64 rounded-lg bg-gray-100 flex flex-col items-center justify-center text-gray-400 gap-2">
-                  <PlayCircle className="w-8 h-8" />
-                  <span className="text-xs">ভিডিও / ৩৬০° ট্যুর শীঘ্রই যুক্ত হবে</span>
-                </div>
+              <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+                {(property.images || []).slice(0, 3).map((image) => <img key={image} src={image} alt={property.title} className="h-64 w-full rounded-lg object-cover" />)}
+                {property.video && <video src={property.video} controls className="h-64 w-full rounded-lg bg-gray-100 object-cover" />}
               </div>
             </section>
-          </div>
+          </div>}
 
           <div>
             <h2 className="font-bold text-lg text-gray-900 mb-3">মূল স্পেসিফিকেশন</h2>

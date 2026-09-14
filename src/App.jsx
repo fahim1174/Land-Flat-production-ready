@@ -10,18 +10,41 @@ import { INITIAL_PROPERTIES } from './data/properties';
 import whatsappIcon from './assets/whatsapp.png';
 import messengerIcon from './assets/messenger.png';
 
+function createUniquePropertyId(properties, type) {
+  const prefix = type === 'land' ? 'LF-BRL-' : 'LF-BRF-';
+  const usedIds = new Set(properties.map((property) => property.propertyId));
+  let sequence = 1;
+  let propertyId = `${prefix}${String(sequence).padStart(3, '0')}`;
+  while (usedIds.has(propertyId)) {
+    sequence += 1;
+    propertyId = `${prefix}${String(sequence).padStart(3, '0')}`;
+  }
+  return propertyId;
+}
+
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [properties, setProperties] = useState(() => {
     const savedProperties = localStorage.getItem('land-flat-properties');
     if (!savedProperties) return INITIAL_PROPERTIES;
-    return JSON.parse(savedProperties).map((property) => {
+    const saved = JSON.parse(savedProperties);
+    const restored = [];
+    return saved.map((property) => {
       const initialProperty = INITIAL_PROPERTIES.find((item) => item.id === property.id);
-      return {
+      const preferredId = property.propertyId || initialProperty?.propertyId;
+      const propertyId = preferredId && !restored.some((item) => item.propertyId === preferredId)
+        ? preferredId
+        : createUniquePropertyId(restored, property.type);
+      const restoredProperty = {
         ...property,
+        propertyId,
         leadCount: property.leadCount ?? initialProperty?.leadCount ?? 0,
         viewCount: property.viewCount ?? initialProperty?.viewCount ?? 0
+      };
+      restored.push(restoredProperty);
+      return {
+        ...restoredProperty
       };
     });
   });
@@ -175,6 +198,7 @@ export default function App() {
           <AdminCRM
             properties={properties}
             setProperties={setProperties}
+            navigateTo={navigateTo}
             isLoggedIn={isAdminLoggedIn}
             setIsLoggedIn={setIsAdminLoggedIn}
             pin={adminPin}

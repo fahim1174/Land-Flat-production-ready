@@ -22,11 +22,11 @@ export default function PropertyCard({ property, navigateTo, isWishlisted, toggl
     <article className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
       <div>
         <div className="relative">
-          <img
+          {property.images?.[0] && <img
             src={property.images[0]}
             alt={property.title}
             className="w-full h-44 object-cover"
-          />
+          />}
           <span
             className={`absolute top-3 left-3 text-white text-[11px] font-bold px-2.5 py-1 rounded-md ${
               property.type === 'land' ? 'bg-[#00875A]' : 'bg-blue-600'
@@ -57,9 +57,9 @@ export default function PropertyCard({ property, navigateTo, isWishlisted, toggl
                 <CheckCircle2 className="w-3 h-3" /> ভেরিফাইড
               </span>
             )}
-            <span className="bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-semibold px-2 py-1 rounded-md flex items-center gap-1">
-              <FileCheck2 className="w-3 h-3" /> কাগজপত্র প্রস্তুত
-            </span>
+            {property.verificationStatus && property.verificationStatus !== 'Pending' && <span className="bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-semibold px-2 py-1 rounded-md flex items-center gap-1">
+              <FileCheck2 className="w-3 h-3" /> {property.verificationStatus}
+            </span>}
           </div>
 
           <h3 className="font-bold text-gray-900 text-sm sm:text-base line-clamp-2 mb-2">
