@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, ChevronDown, FileText, FolderOpen, MapPin, Search, ShieldCheck, UserCheck } from 'lucide-react';
+import { ArrowRight, ChevronDown, FileText, MapPin, Search, ShieldCheck, UserCheck } from 'lucide-react';
 import PropertyCard from './PropertyCard';
 import { BARISAL_LOCATIONS } from '../data/properties';
 import heroImage from '../assets/hero.png.jpg';
@@ -7,11 +7,6 @@ import heroImage from '../assets/hero.png.jpg';
 export default function HomePage({ properties, navigateTo, wishlist, toggleWishlist, searchFilters, setSearchFilters }) {
   const [openFaq, setOpenFaq] = useState(0);
   const popularAreas = BARISAL_LOCATIONS;
-  const testimonials = [
-    { name: 'সাব্বির আহমেদ', role: 'জমি ক্রেতা, আমতলা', text: 'সঠিক তথ্য ও site visit-এর সহায়তায় খুব সহজে আমাদের পরিবারের জন্য জমি বেছে নিতে পেরেছি।' },
-    { name: 'তানজিলা রহমান', role: 'ফ্ল্যাট ক্রেতা, বগুড়া রোড', text: 'প্রপার্টির details এক জায়গায় পাওয়া এবং প্রতিনিধি দলের দ্রুত response আমার জন্য দারুণ helpful ছিল।' },
-    { name: 'মোঃ রফিকুল ইসলাম', role: 'বিক্রেতা, বরিশাল সদর', text: 'আমার property-টি সঠিক buyer-এর কাছে পৌঁছেছে এবং পুরো যোগাযোগ প্রক্রিয়াটি স্বচ্ছ ছিল।' }
-  ];
   const faqs = [
     ['কাগজপত্র কীভাবে ভেরিফাই করা হয়?', 'আমাদের প্রতিনিধি প্রাথমিক দলিল, খতিয়ান ও নামজারির তথ্য পর্যালোচনা করে listing প্রকাশ করেন। চূড়ান্ত সিদ্ধান্তের আগে নিজস্ব আইনজীবীর মাধ্যমে যাচাই করার পরামর্শ দেওয়া হয়।'],
     ['বিক্রি করতে কতদিন সময় লাগে?', 'সময়টি property type, location, price এবং buyer demand-এর ওপর নির্ভর করে। Listing live হওয়ার পর আমাদের team interested buyers-এর সঙ্গে যোগাযোগ করিয়ে দেয়।'],
@@ -21,24 +16,24 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
   return (
     <div>
       <section
-        className="relative overflow-hidden text-white py-16 px-4"
+        className="relative overflow-hidden text-white py-8 sm:py-14 px-4"
         style={{
           backgroundImage:
-            `linear-gradient(120deg, rgba(3, 24, 18, 0.58), rgba(3, 24, 18, 0.52)), url('${heroImage}')`,
+            `linear-gradient(120deg, rgba(3, 24, 18, 0.68), rgba(3, 24, 18, 0.6)), url('${heroImage}')`,
           backgroundSize: 'cover',
           backgroundPosition: 'center bottom'
         }}
       >
         <div className="max-w-4xl mx-auto text-center relative z-10">
-          <h1 className="text-4xl sm:text-5xl font-extrabold mb-6 leading-tight drop-shadow-lg">
-              বরিশালে আপনার স্বপ্নের <span className="text-emerald-300">জমি ও ফ্ল্যাট</span>
+          <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-white leading-tight tracking-tight text-center drop-shadow-md mb-3 sm:mb-6 px-2">
+            বরিশালে আপনার<br /><span className="text-emerald-400 font-black">স্বপ্নের জমি ও ফ্ল্যাট</span>
           </h1>
-            <p className="text-white font-semibold text-sm sm:text-base mt-2 mb-8 max-w-xl mx-auto leading-relaxed drop-shadow-md">
+          <p className="hidden sm:block text-white/90 font-medium text-xs sm:text-base mt-2 mb-6 sm:mb-8 max-w-xl mx-auto leading-relaxed drop-shadow-md px-2">
             আমতলা, বগুড়া রোড, সিএন্ডবি রোড ও রুপাতলীর সঠিক কাগজপত্রের ভেরিফাইড প্রপার্টি বেছে নিন সরাসরি ল্যান্ড অ্যান্ড ফ্ল্যাটের মাধ্যমে।
           </p>
 
-          <div className="bg-black/40 p-4 sm:p-6 rounded-2xl text-white max-w-3xl mx-auto border border-white/20 shadow-xl backdrop-blur-sm">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="bg-black/50 backdrop-blur-md p-3 sm:p-4 rounded-2xl text-white max-w-3xl mx-auto border border-white/10 shadow-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
               <div>
                 <label className="block text-xs font-bold text-white mb-1 text-left drop-shadow-md">প্রপার্টি টাইপ</label>
                 <select
@@ -81,7 +76,7 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
               <div className="flex items-end">
                 <button
                   onClick={() => navigateTo(searchFilters.type === 'flat' ? 'flat' : 'land')}
-                  className="w-full bg-[#00875A] text-white font-medium py-2.5 px-4 rounded-lg hover:bg-[#006644] transition flex items-center justify-center gap-2 text-sm shadow-md"
+                  className="w-full bg-[#00875A] text-white font-medium py-2.5 px-4 rounded-xl hover:bg-[#006644] transition flex items-center justify-center gap-2 text-sm shadow-md"
                 >
                   <Search className="w-4 h-4" /> প্রপার্টি খুঁজুন
                 </button>
@@ -91,7 +86,7 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex justify-between items-end mb-6">
           <div>
             <h2 className="text-xl sm:text-2xl font-bold text-gray-900">সর্বশেষ যুক্ত হওয়া প্রপার্টি</h2>
@@ -102,7 +97,7 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {properties.map((property) => (
             <PropertyCard
               key={property.id}
@@ -115,8 +110,8 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
         </div>
       </section>
 
-      <section className="bg-[#E6F4EA] py-12 border-y border-emerald-100">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <section className="bg-[#E6F4EA] py-10 border-y border-emerald-100">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
           <div className="p-4 bg-white rounded-xl border border-emerald-100 shadow-sm">
             <ShieldCheck className="w-8 h-8 text-[#00875A] mx-auto mb-2" />
             <h4 className="font-bold text-sm text-gray-900 mb-1">কাগজপত্র ভেরিফাইড</h4>
@@ -140,36 +135,70 @@ export default function HomePage({ properties, navigateTo, wishlist, toggleWishl
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-4 my-16">
-        <div className="bg-gradient-to-r from-[#00875A] to-emerald-800 rounded-2xl p-6 sm:p-10 text-white flex flex-col md:flex-row items-center justify-between shadow-lg">
-          <div className="mb-6 md:mb-0 max-w-lg">
-            <h3 className="text-xl sm:text-2xl font-bold mb-2">আপনি কি বরিশাল শহরের প্রপার্টি বিক্রি করতে চান?</h3>
-            <p className="text-emerald-100 text-xs sm:text-sm">
-              আপনার জমি বা ফ্ল্যাটের সঠিক তথ্য দিন। আমাদের টিম সরেজমিনে ভেরিফাই করে ক্রেতার সাথে যোগাযোগ করিয়ে দেবে।
-            </p>
-          </div>
-          <button
-            onClick={() => navigateTo('submit')}
-            className="bg-white text-[#00875A] font-bold px-6 py-3 rounded-xl hover:bg-emerald-50 transition shadow-md whitespace-nowrap text-sm"
-          >
-            প্রপার্টি তথ্য জমা দিন &rarr;
-          </button>
-        </div>
-      </section>
-
-      <section className="max-w-7xl mx-auto px-4 py-12">
+      <section className="max-w-7xl mx-auto px-4 py-10">
         <div className="flex items-end justify-between mb-6"><div><h2 className="text-xl sm:text-2xl font-bold text-gray-900">এলাকা অনুযায়ী প্রপার্টি দেখুন</h2><p className="text-xs sm:text-sm text-gray-500 mt-1">আপনার পছন্দের বরিশাল location থেকে শুরু করুন</p></div></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
           {popularAreas.map((area) => {
-            const areaCount = properties.filter((property) => property.area.includes(area)).length;
-            return <button key={area} onClick={() => { setSearchFilters({ ...searchFilters, area }); navigateTo('area'); }} className="group relative overflow-hidden text-left bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:border-[#00875A] hover:shadow-md transition"><FolderOpen className="w-9 h-9 text-[#00875A] mb-4" /><span className="block font-bold text-gray-900 group-hover:text-[#00875A]">{area}, বরিশাল</span><span className="mt-1 block text-xs text-gray-500">{areaCount} টি listing <ArrowRight className="inline w-3 h-3" /></span></button>;
+            const count = properties.filter((p) => p.location.includes(area)).length;
+            return (
+              <div
+                key={area}
+                onClick={() => {
+                  setSearchFilters({ ...searchFilters, area });
+                  navigateTo('land');
+                }}
+                className="group cursor-pointer bg-white rounded-xl p-3.5 sm:p-5 border border-gray-200 shadow-sm hover:border-[#00875A] transition flex items-center justify-between"
+              >
+                <div className="flex items-center gap-2.5 sm:gap-3">
+                  <div className="bg-emerald-50 text-[#00875A] p-2 sm:p-3 rounded-lg group-hover:bg-[#00875A] group-hover:text-white transition">
+                    <MapPin className="w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-gray-900 text-xs sm:text-sm group-hover:text-[#00875A] transition">{area}</h3>
+                    <span className="text-[11px] sm:text-xs text-gray-500">{count} টি প্রপার্টি</span>
+                  </div>
+                </div>
+                <ArrowRight className="w-3.5 h-3.5 text-gray-400 group-hover:text-[#00875A] group-hover:translate-x-1 transition hidden sm:block" />
+              </div>
+            );
           })}
         </div>
       </section>
 
-      <section className="bg-slate-50 py-12"><div className="max-w-7xl mx-auto px-4"><div className="mb-6"><h2 className="text-xl sm:text-2xl font-bold text-gray-900">আমাদের গ্রাহকের অভিজ্ঞতা</h2><p className="text-xs sm:text-sm text-gray-500 mt-1">বরিশালের ক্রেতা ও বিক্রেতাদের কিছু কথা</p></div><div className="grid grid-cols-1 md:grid-cols-3 gap-5">{testimonials.map((testimonial) => <article key={testimonial.name} className="bg-white rounded-xl p-5 shadow-sm"><div className="flex gap-1 text-amber-400 mb-4">★★★★★</div><p className="text-sm text-gray-600 leading-6">“{testimonial.text}”</p><div className="mt-5 pt-4 border-t border-gray-100"><p className="font-bold text-gray-900 text-sm">{testimonial.name}</p><p className="text-xs text-gray-500 mt-1">{testimonial.role}</p></div></article>)}</div></div></section>
+      <section className="bg-[#00875A] text-white py-6 sm:py-10 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div className="max-w-lg">
+            <h3 className="text-lg sm:text-2xl font-bold mb-1.5 sm:mb-2">আপনি কি বরিশাল শহরের প্রপার্টি বিক্রি করতে চান?</h3>
+            <p className="text-emerald-100 text-xs sm:text-sm">
+              সঠিক ক্রেতার কাছে পৌঁছাতে এবং দ্রুত ও নিরাপদ লেনদেনের জন্য আজই আপনার জমি বা ফ্ল্যাটের তথ্য আমাদের দিন।
+            </p>
+          </div>
+          <button
+            onClick={() => navigateTo('submit')}
+            className="bg-white text-[#00875A] font-bold px-6 py-3 rounded-xl text-xs sm:text-sm hover:bg-emerald-50 transition shadow-lg shrink-0"
+          >
+            জমি বা ফ্ল্যাটের তথ্য জমা দিন
+          </button>
+        </div>
+      </section>
 
-      <section className="max-w-3xl mx-auto px-4 py-12"><div className="text-center mb-7"><h2 className="text-xl sm:text-2xl font-bold text-gray-900">সচরাচর জিজ্ঞাসা</h2><p className="text-xs sm:text-sm text-gray-500 mt-1">প্রপার্টি কেনাবেচা নিয়ে সাধারণ কিছু প্রশ্ন</p></div><div className="space-y-3">{faqs.map(([question, answer], index) => <div key={question} className="bg-white rounded-xl shadow-sm overflow-hidden"><button onClick={() => setOpenFaq(openFaq === index ? -1 : index)} className="w-full flex items-center justify-between gap-4 p-5 text-left font-bold text-sm text-gray-900"><span>{question}</span><ChevronDown className={`w-4 h-4 shrink-0 text-[#00875A] transition ${openFaq === index ? 'rotate-180' : ''}`} /></button>{openFaq === index && <p className="px-5 pb-5 text-sm text-gray-600 leading-6">{answer}</p>}</div>)}</div></section>
+      <section className="max-w-7xl mx-auto px-4 py-6 pb-6">
+        <div className="max-w-2xl mb-4"><h2 className="text-xl sm:text-2xl font-bold text-gray-900">সচরাচর জিজ্ঞাসিত প্রশ্ন (FAQ)</h2><p className="text-xs sm:text-sm text-gray-500 mt-0.5">আমাদের সেবা ও প্রক্রিয়া সম্পর্কে সাধারণ কিছু প্রশ্নের উত্তর</p></div>
+        <div className="space-y-2.5 max-w-3xl">
+          {faqs.map(([q, a], idx) => (
+            <div key={q} className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <button
+                onClick={() => setOpenFaq(openFaq === idx ? -1 : idx)}
+                className="w-full text-left p-3.5 sm:p-4 font-semibold text-gray-900 flex justify-between items-center text-xs sm:text-sm hover:bg-gray-50"
+              >
+                <span>{q}</span>
+                <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${openFaq === idx ? 'rotate-180 text-[#00875A]' : ''}`} />
+              </button>
+              {openFaq === idx && <div className="p-3.5 sm:p-4 pt-0 text-xs sm:text-sm text-gray-600 leading-relaxed border-t border-gray-100">{a}</div>}
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

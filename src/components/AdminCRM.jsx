@@ -173,29 +173,35 @@ export default function AdminCRM({
   const [selectedAdminProperty, setSelectedAdminProperty] = useState(null);
   if (!isLoggedIn)
     return (
-      <div className="max-w-md mx-auto my-12 p-6 bg-white border rounded-xl text-center">
-        <h2 className="font-bold text-lg mb-4">এডমিন প্যানেল প্রবেশ করুন</h2>
-        <form
-          onSubmit={(event) => {
-            event.preventDefault();
-            if (pin === "1234") setIsLoggedIn(true);
-            else alert("ভুল পিন (পাসওয়ার্ড: 1234)");
-          }}
-        >
-          <input
-            type="password"
-            placeholder="PIN দিন (ডিফোল্ট: 1234)"
-            value={pin}
-            onChange={(event) => setPin(event.target.value)}
-            className="w-full text-xs p-2.5 border rounded-lg mb-3"
-          />
-          <button
-            type="submit"
-            className="w-full bg-[#00875A] text-white py-2.5 rounded-lg text-xs font-bold"
+      <div className="flex min-h-[70vh] items-center justify-center p-4">
+        <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-xl border border-gray-100 text-center">
+          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#00875A]/10 text-[#00875A]">
+            <LayoutDashboard className="h-7 w-7" />
+          </div>
+          <h2 className="text-xl font-extrabold text-gray-900 mb-2">অ্যাডমিন ড্যাশবোর্ড</h2>
+          <p className="text-xs text-gray-500 mb-6">নিরাপদ প্রবেশাধিকারের জন্য পিন নম্বর দিন (ডিফোল্ট: 1234)</p>
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (pin === "1234") setIsLoggedIn(true);
+              else alert("ভুল পিন (পাসওয়ার্ড: 1234)");
+            }}
           >
-            লগইন
-          </button>
-        </form>
+            <input
+              type="password"
+              placeholder="পিন দিন (যেমন: 1234)"
+              value={pin}
+              onChange={(event) => setPin(event.target.value)}
+              className="w-full rounded-xl border border-gray-200 bg-gray-50 p-3.5 text-sm font-semibold text-gray-800 focus:border-[#00875A] focus:outline-none mb-4"
+            />
+            <button
+              type="submit"
+              className="w-full rounded-xl bg-[#00875A] py-3.5 text-sm font-bold text-white shadow-sm transition hover:bg-[#006644]"
+            >
+              প্রবেশ করুন
+            </button>
+          </form>
+        </div>
       </div>
     );
   const activeCount = properties.filter(
@@ -270,164 +276,193 @@ export default function AdminCRM({
     if (isNewProperty) setPreviewProperty(savedProperty);
   };
   return (
-    <div className="mx-auto w-full max-w-[1440px] px-3 py-4 sm:px-4 sm:py-6">
-      <header className="mb-5 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-        <div>
-          <p className="text-xs font-bold uppercase tracking-widest text-[#00875A]">
-            Land&Flat CRM
-          </p>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">
-            বরিশাল অপারেশন ড্যাশবোর্ড
-          </h1>
-        </div>
-        <button
-          onClick={() => setIsLoggedIn(false)}
-          className="self-start text-xs bg-red-100 text-red-600 px-3 py-2 rounded-lg font-bold"
-        >
-          লগআউট
-        </button>
-      </header>
-      <div className="grid min-w-0 items-start gap-4 lg:grid-cols-[230px_minmax(0,1fr)] lg:gap-6">
-        <aside className="min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white p-2.5 lg:sticky lg:top-24 lg:p-3">
-          <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            Admin options
-          </p>
-          <nav className="flex gap-2 overflow-x-auto pb-1 lg:flex-col lg:pb-0">
-            <SideNavButton
-              active={tab === "inventory" && editingProperty !== "new"}
-              icon={LayoutDashboard}
-              onClick={() => {
-                setTab("inventory");
-                setEditingProperty(null);
-              }}
-            >
-              ইনভেন্টরি
-            </SideNavButton>
-            <SideNavButton
-              active={editingProperty === "new"}
-              icon={PlusCircle}
-              onClick={() => {
-                setTab("inventory");
-                setEditingProperty("new");
-              }}
-            >
-              নতুন listing
-            </SideNavButton>
-            <SideNavButton
-              active={tab === "previews"}
-              icon={Eye}
-              className="lg:ml-3"
-              onClick={() => {
-                setTab("previews");
-                setEditingProperty(null);
-              }}
-            >
-              Preview
-            </SideNavButton>
-            <SideNavButton
-              active={tab === "sellers"}
-              icon={Users}
-              onClick={() => {
-                setTab("sellers");
-                setEditingProperty(null);
-              }}
-            >
-              সেলার মনিটরিং
-            </SideNavButton>
-            <SideNavButton
-              active={tab === "leads"}
-              icon={MessageSquare}
-              onClick={() => {
-                setTab("leads");
-                setEditingProperty(null);
-              }}
-            >
-              বায়ার ও লিড
-            </SideNavButton>
-            <SideNavButton
-              active={tab === "finance"}
-              icon={Eye}
-              onClick={() => {
-                setTab("finance");
-                setEditingProperty(null);
-              }}
-            >
-              অ্যাকাউন্টস / ফাইন্যান্স
-            </SideNavButton>
-          </nav>
-        </aside>
-        <section className="min-w-0">
-          <AdminSearch
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            properties={properties}
-            onOpenProperty={setSelectedAdminProperty}
-            onOpenLead={() => setTab("leads")}
-            onOpenSeller={() => setTab("sellers")}
-          />
-          <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:mb-6 xl:grid-cols-4 xl:gap-4">
-            <SummaryCard
-              label="মোট প্রপার্টি"
-              value={properties.length}
-              icon={Users}
-              color="text-blue-600"
-            />
-            <SummaryCard
-              label="সক্রিয় লিস্টিং"
-              value={activeCount}
-              icon={CheckCircle2}
-              color="text-[#00875A]"
-            />
-            <SummaryCard
-              label="নতুন ইনকোয়ারি"
-              value={leadRecords.filter((lead) => lead.status === "New").length}
-              icon={MessageSquare}
-              color="text-amber-600"
-            />
-            <SummaryCard
-              label="বিক্রীত প্রপার্টি"
-              value={soldCount}
-              icon={CheckCircle2}
-              color="text-violet-600"
-            />
+    <div className="flex min-h-screen bg-white text-gray-900">
+      <aside className="hidden w-64 shrink-0 flex-col border-r border-gray-200 bg-white p-4 lg:flex">
+        <div className="flex items-center gap-3 px-3 py-2 mb-6">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#00875A] text-white font-bold shadow-lg shadow-[#00875A]/30">
+            LF
           </div>
-          {tab === "inventory" && (
-            <>
-              {editingProperty && (
-                <PropertyEditor
-                  property={editingProperty === "new" ? null : editingProperty}
-                  onSave={saveProperty}
-                  onCancel={() => setEditingProperty(null)}
-                  navigateTo={navigateTo}
-                />
-              )}
-              <InventoryTable
-                inventory={properties}
-                changeStatus={changeStatus}
-                deleteProperty={deleteProperty}
-                editProperty={setEditingProperty}
-                onLocationSelect={setSelectedLocation}
-                onPreviewProperty={setPreviewProperty}
+          <div>
+            <span className="block text-sm font-extrabold tracking-wide text-gray-900">Land&Flat</span>
+            <span className="block text-[10px] font-bold uppercase tracking-widest text-[#00875A]">Barisal Admin</span>
+          </div>
+        </div>
+        <p className="px-3 pb-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+          Main Menu
+        </p>
+        <nav className="space-y-1.5 flex-1">
+          <SideNavButton
+            active={tab === "inventory" && editingProperty !== "new"}
+            icon={LayoutDashboard}
+            onClick={() => {
+              setTab("inventory");
+              setEditingProperty(null);
+            }}
+          >
+            ইনভেন্টরি
+          </SideNavButton>
+          <SideNavButton
+            active={editingProperty === "new"}
+            icon={PlusCircle}
+            onClick={() => {
+              setTab("inventory");
+              setEditingProperty("new");
+            }}
+          >
+            নতুন listing
+          </SideNavButton>
+          <SideNavButton
+            active={tab === "previews"}
+            icon={Eye}
+            onClick={() => {
+              setTab("previews");
+              setEditingProperty(null);
+            }}
+          >
+            Preview
+          </SideNavButton>
+          <SideNavButton
+            active={tab === "sellers"}
+            icon={Users}
+            onClick={() => {
+              setTab("sellers");
+              setEditingProperty(null);
+            }}
+          >
+            সেলার মনিটরিং
+          </SideNavButton>
+          <SideNavButton
+            active={tab === "leads"}
+            icon={MessageSquare}
+            onClick={() => {
+              setTab("leads");
+              setEditingProperty(null);
+            }}
+          >
+            বায়ার ও লিড
+          </SideNavButton>
+          <SideNavButton
+            active={tab === "finance"}
+            icon={Eye}
+            onClick={() => {
+              setTab("finance");
+              setEditingProperty(null);
+            }}
+          >
+            অ্যাকাউন্টস / ফাইন্যান্স
+          </SideNavButton>
+        </nav>
+        <div className="pt-4 border-t border-gray-200">
+          <button
+            onClick={() => setIsLoggedIn(false)}
+            className="w-full flex items-center justify-center gap-2 rounded-xl bg-red-50 text-red-600 py-2.5 text-xs font-bold transition hover:bg-red-100"
+          >
+            লগআউট করুন
+          </button>
+        </div>
+      </aside>
+      <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 bg-gray-50">
+        <header className="mb-6 flex flex-col gap-4 rounded-2xl bg-white p-5 shadow-sm border border-gray-200 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-widest text-[#00875A]">
+                Welcome back
+              </p>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">
+                বরিশাল অপারেশন ড্যাশবোর্ড
+              </h1>
+            </div>
+            <button
+              onClick={() => setIsLoggedIn(false)}
+              className="lg:hidden text-xs bg-red-500/10 text-red-400 px-3 py-2 rounded-xl font-bold"
+            >
+              লগআউট
+            </button>
+          </div>
+          <div className="lg:hidden flex gap-2 overflow-x-auto pb-1">
+            <button onClick={() => { setTab("inventory"); setEditingProperty(null); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 ${tab === 'inventory' && editingProperty !== 'new' ? 'bg-[#00875A] text-white' : 'bg-slate-800 text-slate-300'}`}>ইনভেন্টরি</button>
+            <button onClick={() => { setTab("inventory"); setEditingProperty("new"); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 ${editingProperty === 'new' ? 'bg-[#00875A] text-white' : 'bg-slate-800 text-slate-300'}`}>নতুন</button>
+            <button onClick={() => { setTab("previews"); setEditingProperty(null); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 ${tab === 'previews' ? 'bg-[#00875A] text-white' : 'bg-slate-800 text-slate-300'}`}>Preview</button>
+            <button onClick={() => { setTab("sellers"); setEditingProperty(null); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 ${tab === 'sellers' ? 'bg-[#00875A] text-white' : 'bg-slate-800 text-slate-300'}`}>সেলার</button>
+            <button onClick={() => { setTab("leads"); setEditingProperty(null); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 ${tab === 'leads' ? 'bg-[#00875A] text-white' : 'bg-slate-800 text-slate-300'}`}>লিড</button>
+            <button onClick={() => { setTab("finance"); setEditingProperty(null); }} className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 ${tab === 'finance' ? 'bg-[#00875A] text-white' : 'bg-slate-800 text-slate-300'}`}>ফাইন্যান্স</button>
+          </div>
+        </header>
+
+        <AdminSearch
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          properties={properties}
+          onOpenProperty={setSelectedAdminProperty}
+          onOpenLead={() => setTab("leads")}
+          onOpenSeller={() => setTab("sellers")}
+        />
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <SummaryCard
+            label="মোট প্রপার্টি"
+            value={properties.length}
+            icon={Users}
+            color="text-blue-400"
+            bg="bg-blue-500/10"
+          />
+          <SummaryCard
+            label="সক্রিয় লিস্টিং"
+            value={activeCount}
+            icon={CheckCircle2}
+            color="text-[#00875A]"
+            bg="bg-[#00875A]/10"
+          />
+          <SummaryCard
+            label="নতুন ইনকোয়ারি"
+            value={leadRecords.filter((lead) => lead.status === "New").length}
+            icon={MessageSquare}
+            color="text-amber-400"
+            bg="bg-amber-500/10"
+          />
+          <SummaryCard
+            label="বিক্রীত প্রপার্টি"
+            value={soldCount}
+            icon={CheckCircle2}
+            color="text-violet-400"
+            bg="bg-violet-500/10"
+          />
+        </div>
+        {tab === "inventory" && (
+          <>
+            {editingProperty && (
+              <PropertyEditor
+                property={editingProperty === "new" ? null : editingProperty}
+                onSave={saveProperty}
+                onCancel={() => setEditingProperty(null)}
+                navigateTo={navigateTo}
               />
-            </>
-          )}
-          {tab === "previews" && (
-            <PreviewQueue
-              properties={properties}
-              onPreview={setPreviewProperty}
-              onEdit={(property) => {
-                setTab("inventory");
-                setEditingProperty(property);
-              }}
+            )}
+            <InventoryTable
+              inventory={properties}
+              changeStatus={changeStatus}
+              deleteProperty={deleteProperty}
+              editProperty={setEditingProperty}
+              onLocationSelect={setSelectedLocation}
+              onPreviewProperty={setPreviewProperty}
             />
-          )}
-          {tab === "sellers" && <SellerTable />}
-          {tab === "leads" && (
-            <LeadTable leads={leadRecords} setLeads={setLeadRecords} onLeadAction={handleLeadAction} />
-          )}
-          {tab === "finance" && <FinanceTable />}
-        </section>
-      </div>
+          </>
+        )}
+        {tab === "previews" && (
+          <PreviewQueue
+            properties={properties}
+            onPreview={setPreviewProperty}
+            onEdit={(property) => {
+              setTab("inventory");
+              setEditingProperty(property);
+            }}
+          />
+        )}
+        {tab === "sellers" && <SellerTable />}
+        {tab === "leads" && (
+          <LeadTable leads={leadRecords} setLeads={setLeadRecords} onLeadAction={handleLeadAction} />
+        )}
+        {tab === "finance" && <FinanceTable />}
+      </main>
       {previewProperty && (
         <PropertyApprovalPreview
           property={previewProperty}

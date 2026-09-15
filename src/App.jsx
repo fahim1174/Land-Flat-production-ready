@@ -23,7 +23,12 @@ function createUniquePropertyId(properties, type) {
 }
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState('home');
+  const [currentPage, setCurrentPage] = useState(() => {
+    if (window.location.pathname === '/admin' || window.location.hash === '#admin') {
+      return 'admin';
+    }
+    return 'home';
+  });
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [properties, setProperties] = useState(() => {
     const savedProperties = localStorage.getItem('land-flat-properties');
@@ -73,6 +78,11 @@ export default function App() {
 
   const navigateTo = (page, property = null) => {
     setCurrentPage(page);
+    if (page === 'admin') {
+      window.history.pushState({}, '', '/admin');
+    } else if (page === 'home') {
+      window.history.pushState({}, '', '/');
+    }
     if (property) {
       setSelectedProperty(property);
       if (page === 'details') {
@@ -84,8 +94,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-800 font-sans flex flex-col justify-between">
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+    <div className="flex flex-col min-h-screen bg-slate-50 text-gray-800 font-sans">
+      <header className="sticky top-0 z-[160] bg-white opacity-100 border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div onClick={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
             <div className="bg-[#00875A] text-white p-2 rounded-lg">
@@ -119,16 +129,14 @@ export default function App() {
               <PlusCircle className="w-4 h-4" /> জমি/ফ্ল্যাট দিন
             </button>
 
-            <button onClick={() => navigateTo('admin')} className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-2 rounded-lg font-medium">
-              এডমিন CRM
-            </button>
+
           </div>
 
-          <div className="flex items-center gap-2 md:hidden">
+          <div className="flex items-center gap-1 md:hidden">
             <button onClick={() => navigateTo('wishlist')} className="p-2 text-gray-600 relative">
               <Heart className="w-5 h-5" />
               {wishlist.length > 0 && (
-                <span className="absolute top-0 right-0 bg-red-500 text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                <span className="absolute top-1 right-1 bg-red-500 text-white text-[9px] w-3.5 h-3.5 rounded-full flex items-center justify-center font-bold">
                   {wishlist.length}
                 </span>
               )}
@@ -140,25 +148,31 @@ export default function App() {
         </div>
 
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 space-y-3">
-            <button onClick={() => navigateTo('home')} className="block w-full text-left py-2 text-gray-800 font-medium">হোম</button>
-            <button onClick={() => navigateTo('land')} className="block w-full text-left py-2 text-gray-800 font-medium">জমি</button>
-            <button onClick={() => navigateTo('flat')} className="block w-full text-left py-2 text-gray-800 font-medium">ফ্ল্যাট</button>
-            <button onClick={() => navigateTo('about')} className="block w-full text-left py-2 text-gray-800 font-medium">আমাদের সম্পর্কে</button>
-            <button onClick={() => navigateTo('contact')} className="block w-full text-left py-2 text-gray-800 font-medium">যোগাযোগ</button>
-            <div className="pt-2 flex flex-col gap-2">
-              <button onClick={() => navigateTo('submit')} className="w-full bg-[#00875A] text-white py-2 rounded-lg font-medium text-center flex items-center justify-center gap-2">
-                <PlusCircle className="w-4 h-4" /> জমি/ফ্ল্যাট দিন
-              </button>
-              <button onClick={() => navigateTo('admin')} className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg font-medium text-center text-xs">
-                এডমিন প্যানেল (CRM)
-              </button>
+          <>
+            <div 
+              className="fixed inset-0 top-[64px] bg-black/40 backdrop-blur-sm z-[140] md:hidden animate-fade-in" 
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
+            <div className="md:hidden absolute top-full right-0 left-0 w-full bg-white shadow-xl rounded-b-2xl border-t border-gray-100 z-[150] animate-slide-down">
+              <nav className="flex flex-col">
+                <button onClick={() => navigateTo('home')} className={`text-left py-3 px-5 border-b border-gray-50 font-medium transition-colors active:scale-95 ${currentPage === 'home' ? 'text-emerald-600 bg-emerald-50 font-bold' : 'text-gray-800 hover:bg-emerald-50 hover:text-emerald-600'}`}>হোম</button>
+                <button onClick={() => navigateTo('land')} className={`text-left py-3 px-5 border-b border-gray-50 font-medium transition-colors active:scale-95 ${currentPage === 'land' ? 'text-emerald-600 bg-emerald-50 font-bold' : 'text-gray-800 hover:bg-emerald-50 hover:text-emerald-600'}`}>জমি</button>
+                <button onClick={() => navigateTo('flat')} className={`text-left py-3 px-5 border-b border-gray-50 font-medium transition-colors active:scale-95 ${currentPage === 'flat' ? 'text-emerald-600 bg-emerald-50 font-bold' : 'text-gray-800 hover:bg-emerald-50 hover:text-emerald-600'}`}>ফ্ল্যাট</button>
+                <button onClick={() => navigateTo('about')} className={`text-left py-3 px-5 border-b border-gray-50 font-medium transition-colors active:scale-95 ${currentPage === 'about' ? 'text-emerald-600 bg-emerald-50 font-bold' : 'text-gray-800 hover:bg-emerald-50 hover:text-emerald-600'}`}>আমাদের সম্পর্কে</button>
+                <button onClick={() => navigateTo('contact')} className={`text-left py-3 px-5 border-b border-gray-50 font-medium transition-colors active:scale-95 ${currentPage === 'contact' ? 'text-emerald-600 bg-emerald-50 font-bold' : 'text-gray-800 hover:bg-emerald-50 hover:text-emerald-600'}`}>যোগাযোগ</button>
+              </nav>
+
+              <div className="p-4 bg-gray-50 rounded-b-2xl">
+                <button onClick={() => navigateTo('submit')} className="w-full bg-emerald-600 text-white font-semibold py-3 rounded-xl shadow-md flex items-center justify-center gap-2 hover:bg-emerald-700 transition active:scale-95">
+                  <PlusCircle className="w-5 h-5" /> জমি/ফ্ল্যাট দিন
+                </button>
+              </div>
             </div>
-          </div>
+          </>
         )}
       </header>
 
-      <main className="flex-grow">
+      <main className="flex-1 w-full max-w-md mx-auto px-4 py-4 min-h-0">
         {currentPage === 'home' && (
           <HomePage
             properties={publishedProperties}
@@ -207,10 +221,10 @@ export default function App() {
         )}
       </main>
 
-      <footer className="bg-gray-900 text-gray-300 pt-12 pb-8 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <footer className="bg-gray-900 text-gray-300 pt-10 pb-20 md:pb-8 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-x-4 gap-y-6 text-left">
           <div>
-            <div className="flex items-center gap-2 text-white font-bold text-lg mb-3">
+            <div className="flex items-center gap-2 text-white font-bold text-sm sm:text-base mb-2">
               <div className="bg-[#00875A] p-1.5 rounded">
                 <Building2 className="w-4 h-4 text-white" />
               </div>
@@ -222,68 +236,85 @@ export default function App() {
           </div>
 
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3">দ্রুত লিঙ্ক</h4>
-            <ul className="space-y-2 text-xs">
-              <li><button onClick={() => navigateTo('home')} className="hover:text-white">হোম</button></li>
-              <li><button onClick={() => navigateTo('land')} className="hover:text-white">আমতলার জমি</button></li>
-              <li><button onClick={() => navigateTo('flat')} className="hover:text-white">বগুড়া রোডের ফ্ল্যাট</button></li>
-              <li><button onClick={() => navigateTo('submit')} className="hover:text-white">জমি বা ফ্ল্যাট দিন</button></li>
+            <h4 className="text-white text-sm font-semibold mb-2">দ্রুত লিঙ্ক</h4>
+            <ul className="space-y-1.5 text-xs text-gray-300">
+              <li><button onClick={() => navigateTo('home')} className="hover:text-white transition-colors">হোম</button></li>
+              <li><button onClick={() => navigateTo('land')} className="hover:text-white transition-colors">আমতলার জমি</button></li>
+              <li><button onClick={() => navigateTo('flat')} className="hover:text-white transition-colors">বগুড়া রোডের ফ্ল্যাট</button></li>
+              <li><button onClick={() => navigateTo('submit')} className="hover:text-white transition-colors">জমি বা ফ্ল্যাট দিন</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3">জরুরি সেবা</h4>
-            <ul className="space-y-2 text-xs">
-              <li><button onClick={() => navigateTo('about')} className="hover:text-white">আমাদের সম্পর্কে</button></li>
-              <li><button onClick={() => navigateTo('contact')} className="hover:text-white">যোগাযোগ ও হেল্পলাইন</button></li>
-              <li><button onClick={() => navigateTo('privacy')} className="hover:text-white">প্রাইভেসি পলিসি</button></li>
-              <li><button onClick={() => navigateTo('terms')} className="hover:text-white">টার্মস অ্যান্ড কন্ডিশন</button></li>
+            <h4 className="text-white text-sm font-semibold mb-2">জরুরি সেবা</h4>
+            <ul className="space-y-1.5 text-xs text-gray-300">
+              <li><button onClick={() => navigateTo('about')} className="hover:text-white transition-colors">আমাদের সম্পর্কে</button></li>
+              <li><button onClick={() => navigateTo('contact')} className="hover:text-white transition-colors">যোগাযোগ ও হেল্পলাইন</button></li>
+              <li><button onClick={() => navigateTo('privacy')} className="hover:text-white transition-colors">প্রাইভেসি পলিসি</button></li>
+              <li><button onClick={() => navigateTo('terms')} className="hover:text-white transition-colors">টার্মস অ্যান্ড কন্ডিশন</button></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-white text-sm font-semibold mb-3">বরিশাল অফিস</h4>
-            <p className="text-xs text-gray-400 mb-2 flex items-start gap-2">
-              <MapPin className="w-4 h-4 text-[#00875A] shrink-0 mt-0.5" />
-              সদর রোড, বরিশাল সদর, বরিশাল।
-            </p>
-            <p className="text-xs text-gray-400 mb-2 flex items-center gap-2">
-              <Phone className="w-4 h-4 text-[#00875A] shrink-0" />
-              01749646441
-            </p>
-            <p className="text-xs text-gray-400 flex items-center gap-2">
-              <Mail className="w-4 h-4 text-[#00875A] shrink-0" />
-              fahimukil49@gmail.com
-            </p>
+            <h4 className="text-white text-sm font-semibold mb-2">বরিশাল অফিস</h4>
+            <div className="space-y-2 text-xs text-gray-400">
+              <p className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 text-[#00875A] shrink-0 mt-0.5" />
+                সদর রোড, বরিশাল সদর, বরিশাল।
+              </p>
+              <p className="flex items-center gap-2">
+                <Phone className="w-4 h-4 text-[#00875A] shrink-0" />
+                01903431174
+              </p>
+              <p className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-[#00875A] shrink-0" />
+                fahimukil49@gmail.com
+              </p>
+            </div>
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 pt-6 border-t border-gray-800 text-center text-xs text-gray-500">
+        <div className="max-w-7xl mx-auto px-4 pt-4 mt-6 border-t border-slate-800/80 text-center text-xs text-slate-400">
           &copy; 2026 Land&Flat Barisal. All rights reserved.
         </div>
       </footer>
 
-      <div className="fixed right-5 bottom-5 z-50 flex flex-col gap-3">
+      <div className="fixed right-5 bottom-20 z-50 flex flex-col gap-3">
         <a
-          href="https://wa.me/8801749646441"
+          href="https://wa.me/8801903-431174"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           aria-label="WhatsApp-এ যোগাযোগ করুন"
           title="WhatsApp-এ যোগাযোগ করুন"
-          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#25D366] shadow-lg transition hover:scale-105"
+          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#25D366] shadow-lg transition-transform duration-150 active:scale-95 hover:scale-105 animate-pulse"
         >
           <img src={whatsappIcon} alt="WhatsApp" className="h-10 w-10 object-contain" />
         </a>
         <a
-          href="https://business.facebook.com/latest/inbox/all/?nav_ref=manage_page_ap_plus_inbox_message_button&asset_id=1228252993699966"
+          href="https://m.me/washim.akramfahim.9"
           target="_blank"
-          rel="noreferrer"
+          rel="noopener noreferrer"
           aria-label="Messenger-এ যোগাযোগ করুন"
           title="Messenger-এ যোগাযোগ করুন"
-          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#0084FF] shadow-lg transition hover:scale-105"
+          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#0084FF] shadow-lg transition-transform duration-150 active:scale-95 hover:scale-105 animate-pulse"
         >
           <img src={messengerIcon} alt="Messenger" className="h-10 w-10 object-contain" />
         </a>
+      </div>
+
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg flex justify-around items-center py-2 px-1">
+        <button onClick={() => navigateTo('home')} className={`flex flex-col items-center justify-center w-1/3 text-[11px] ${currentPage === 'home' ? 'text-[#00875A] font-bold' : 'text-gray-600'}`}>
+          <Building2 className="w-5 h-5 mb-0.5" />
+          <span>হোম</span>
+        </button>
+        <button onClick={() => navigateTo('land')} className={`flex flex-col items-center justify-center w-1/3 text-[11px] ${currentPage === 'land' ? 'text-[#00875A] font-bold' : 'text-gray-600'}`}>
+          <MapPin className="w-5 h-5 mb-0.5" />
+          <span>জমি</span>
+        </button>
+        <button onClick={() => navigateTo('flat')} className={`flex flex-col items-center justify-center w-1/3 text-[11px] ${currentPage === 'flat' ? 'text-[#00875A] font-bold' : 'text-gray-600'}`}>
+          <Building2 className="w-5 h-5 mb-0.5" />
+          <span>ফ্ল্যাট</span>
+        </button>
       </div>
     </div>
   );
