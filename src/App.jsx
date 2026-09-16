@@ -95,7 +95,7 @@ export default function App() {
 
   return (
     <div className="flex flex-col min-h-screen bg-slate-50 text-gray-800 font-sans">
-      <header className="sticky top-0 z-[160] bg-white opacity-100 border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-[160] bg-emerald-50/70 md:bg-white backdrop-blur-md opacity-100 border-b border-gray-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div onClick={() => navigateTo('home')} className="flex items-center gap-2 cursor-pointer">
             <div className="bg-[#00875A] text-white p-2 rounded-lg">
@@ -172,7 +172,7 @@ export default function App() {
         )}
       </header>
 
-      <main className="flex-1 w-full max-w-md mx-auto px-4 py-4 min-h-0">
+      <main className="flex-1 w-full max-w-7xl mx-auto px-4 lg:px-8 py-6 min-h-0">
         {currentPage === 'home' && (
           <HomePage
             properties={publishedProperties}

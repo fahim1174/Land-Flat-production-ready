@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BadgeCheck, Clock3, Coins, Copyright, FileCheck, FileCheck2, HandCoins, HeartHandshake, Mail, MapPin, MessageCircle, Phone, PlayCircle, Scale, Send, ShieldAlert, Users } from 'lucide-react';
+import { BadgeCheck, Clock3, Coins, Copyright, FileCheck, FileCheck2, HandCoins, Heart, HeartHandshake, Mail, MapPin, MessageCircle, Phone, PlayCircle, Scale, Send, ShieldAlert, Users } from 'lucide-react';
 import PropertyCard from './PropertyCard';
 
 export function AboutPage() {
@@ -203,10 +203,22 @@ function TermsCard({ icon: Icon, title, text }) {
 
 export function WishlistPage({ properties, navigateTo, toggleWishlist }) {
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-6">আপনার পছন্দের প্রপার্টি ({properties.length})</h1>
+    <div className="max-w-7xl mx-auto px-4 py-8 pb-24 md:pb-8">
+      <h1 className="text-xl sm:text-2xl font-bold mb-6">আপনার পছন্দের প্রপার্টি ({properties.length})</h1>
       {properties.length === 0 ? (
-        <p className="text-xs text-gray-500">আপনার উইশলিস্টে কোনো প্রপার্টি নেই।</p>
+        <div className="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-sm max-w-md mx-auto my-10">
+          <div className="w-16 h-16 bg-emerald-50 text-[#00875A] rounded-full flex items-center justify-center mx-auto mb-4">
+            <Heart className="w-8 h-8" />
+          </div>
+          <h3 className="font-bold text-lg text-gray-900 mb-1">আপনার পছন্দের তালিকায় কোনো প্রপার্টি নেই</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mb-6">আপনার পছন্দের জমি বা ফ্ল্যাটগুলো হার্ট আইকনে ক্লিক করে এখানে সেভ করে রাখুন।</p>
+          <button
+            onClick={() => navigateTo('home')}
+            className="bg-[#00875A] text-white font-bold px-6 py-3 rounded-xl text-xs sm:text-sm hover:bg-[#006644] transition shadow-md active:scale-95"
+          >
+            প্রপার্টি ব্রাউজ করুন
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {properties.map((p) => (
