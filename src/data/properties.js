@@ -46,6 +46,37 @@ export const INITIAL_PROPERTIES = [
     ]
   },
   {
+    id: 'bar-land-001-b',
+    propertyId: 'LF-BRL-011',
+    type: 'land',
+    title: '৫ শতক আবাসিক প্লট আমতলা',
+    slug: '5-shotok-residential-land-amtola-barisal',
+    description:
+      'আমতলা সংলগ্ন এলাকায় রেডি টু বিল্ড ৫ শতক আবাসিক প্লট। এককালীন বা কিস্তিতে ক্রয়ের সুযোগ।',
+    location: 'আমতলা, বরিশাল',
+    district: 'বরিশাল',
+    upazila: 'বরিশাল সদর',
+    area: 'আমতলা',
+    price: 2800000,
+    formattedPrice: '৳ ২৮,০০,০০০',
+    status: 'Published',
+    leadCount: 7,
+    viewCount: 82,
+    verificationStatus: 'Verified',
+    featured: false,
+    published: true,
+    createdAt: '2026-09-02',
+    landSize: '৫ শতক',
+    pricePerDecimal: '৳ ৫,৬০,০০০ / শতক',
+    roadWidth: '২০ ফুট',
+    mouza: 'আমতলা',
+    landCategory: 'Residential',
+    facing: 'পূর্বমুখী',
+    images: [
+      'https://images.unsplash.com/photo-1628624747958-20f5d19e78c3?auto=format&fit=crop&w=800&q=80'
+    ]
+  },
+  {
     id: 'bar-flat-002',
     propertyId: 'LF-BRF-002',
     type: 'flat',
@@ -83,6 +114,42 @@ export const INITIAL_PROPERTIES = [
     ]
   },
   {
+    id: 'bar-flat-002-b',
+    propertyId: 'LF-BRF-022',
+    type: 'flat',
+    title: '১১০০ বর্গফুট ২ বেডরুম অ্যাপার্টমেন্ট বগুড়া রোড',
+    slug: '2-bed-flat-bogra-road-barisal',
+    description:
+      'বগুড়া রোড সংলগ্ন মনোরম পরিবেশে মাঝারি পরিবারের জন্য উপযুক্ত ১১০০ বর্গফুটের আকর্ষণীয় ফ্ল্যাট।',
+    location: 'বগুড়া রোড, বরিশাল',
+    district: 'বরিশাল',
+    upazila: 'বরিশাল সদর',
+    area: 'বগুড়া রোড',
+    price: 4800000,
+    formattedPrice: '৳ ৪৮,০০,০০০',
+    status: 'Published',
+    leadCount: 5,
+    viewCount: 65,
+    verificationStatus: 'Verified',
+    featured: false,
+    published: true,
+    createdAt: '2026-09-06',
+    flatSize: '১০০০ বর্গফুট',
+    bedrooms: 2,
+    bathrooms: 2,
+    floor: '২য় তলা',
+    totalFloors: 6,
+    parking: 'শেয়ার্ড পার্কিং',
+    facing: 'দক্ষিণমুখী',
+    projectName: 'বগুড়া গ্রীন ভিউ',
+    developer: 'গ্রীন লিফ প্রপার্টিজ',
+    handoverStatus: 'রেডি ফ্ল্যাট',
+    pricePerSqft: '৳ ৪,৩৬৩ / বর্গফুট',
+    images: [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=800&q=80'
+    ]
+  },
+  {
     id: 'bar-land-003',
     propertyId: 'LF-BRL-003',
     type: 'land',
@@ -113,6 +180,37 @@ export const INITIAL_PROPERTIES = [
     commercialSuitability: true,
     images: [
       'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'
+    ]
+  },
+  {
+    id: 'bar-land-003-b',
+    propertyId: 'LF-BRL-033',
+    type: 'land',
+    title: '৮ শতক প্লট সিএন্ডবি রোড',
+    slug: '8-shotok-land-c-and-b-road-barisal',
+    description:
+      'সিএন্ডবি রোডের কাছাকাছি স্কয়ার শেপের আবাসিক প্লট। নিরিবিলি ও উন্নত যাতায়াত ব্যবস্থা।',
+    location: 'সিএন্ডবি রোড, বরিশাল',
+    district: 'বরিশাল',
+    upazila: 'বরিশাল সদর',
+    area: 'সিএন্ডবি রোড',
+    price: 6400000,
+    formattedPrice: '৳ ৬৪,০০,০০০',
+    status: 'Published',
+    leadCount: 3,
+    viewCount: 45,
+    verificationStatus: 'Verified',
+    featured: false,
+    published: true,
+    createdAt: '2026-09-12',
+    landSize: '৮ শতক',
+    pricePerDecimal: '৳ ৮,০০,০০০ / শতক',
+    roadWidth: '২০ ফুট',
+    mouza: 'সিএন্ডবি',
+    landCategory: 'Residential',
+    facing: 'উত্তরমুখী',
+    images: [
+      'https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=800&q=80'
     ]
   },
   {
@@ -150,6 +248,109 @@ export const INITIAL_PROPERTIES = [
     amenities: ['বিদ্যুৎ', 'পাসওয়ার্ড', '২৪/৭ সিকিউরিটি'],
     images: [
       'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=800&q=80'
+    ]
+  },
+  {
+    id: 'bar-flat-004-b',
+    propertyId: 'LF-BRF-044',
+    type: 'flat',
+    title: '১৬০০ বর্গফুট ৩ বেডরুম লাক্সারি ফ্ল্যাটুপাতলী',
+    slug: '3-bed-luxury-flat-rupatali-barisal',
+    description:
+      'রুপাতলী গোলচত্বরের কাছে প্রিমিয়াম কোয়ালিটির ৩ বেড লাক্সারি অ্যাপার্টমেন্ট।',
+    location: 'রুপাতলী, বরিশাল',
+    district: 'বরিশাল',
+    upazila: 'বরিশাল সদর',
+    area: 'রুপাতলী',
+    price: 7800000,
+    formattedPrice: '৳ ৭৮,০০,০০০',
+    status: 'Published',
+    leadCount: 9,
+    viewCount: 112,
+    verificationStatus: 'Verified',
+    featured: false,
+    published: true,
+    createdAt: '2026-09-13',
+    flatSize: '১৬০০ বর্গফুট',
+    bedrooms: 3,
+    bathrooms: 3,
+    floor: '৫ম তলা',
+    totalFloors: 8,
+    parking: '১টি কার পার্কিং',
+    facing: 'পূর্বমুখী',
+    projectName: 'রুপাতলী স্কাইভিউ',
+    developer: 'মেট্রো বিল্ডার্স',
+    handoverStatus: 'রেডি ফ্ল্যাট',
+    pricePerSqft: '৳ ৪,৮৭৫ / বর্গফুট',
+    images: [
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'
+    ]
+  },
+  {
+    id: 'bar-land-005',
+    propertyId: 'LF-BRL-005',
+    type: 'land',
+    title: '১২ শতক জমি সদর রোড',
+    slug: '12-shotok-land-sadar-road-barisal',
+    description:
+      'সদর রোডের কাছাকাছি বাণিজ্যিক ও আবাসিক উভয় ব্যবহারের উপযোগী অত্যন্ত গুরুত্বপূর্ণ লোকেশনের জমি।',
+    location: 'সদর রোড, বরিশাল',
+    district: 'বরিশাল',
+    upazila: 'বরিশাল সদর',
+    area: 'সদর রোড',
+    price: 15000000,
+    formattedPrice: '৳ ১,৫০,০০,০০০',
+    status: 'Published',
+    leadCount: 15,
+    viewCount: 230,
+    verificationStatus: 'Verified',
+    featured: true,
+    published: true,
+    createdAt: '2026-09-03',
+    landSize: '১২ শতক',
+    pricePerDecimal: '৳ ১২,৫০,০০০ / শতক',
+    roadWidth: '৪০ ফুট',
+    mouza: 'সদর',
+    landCategory: 'Commercial',
+    facing: 'পশ্চিমমুখী',
+    images: [
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80'
+    ]
+  },
+  {
+    id: 'bar-flat-006',
+    propertyId: 'LF-BRF-006',
+    type: 'flat',
+    title: '১৩৫০ বর্গফুট ৩ বেড ফ্ল্যাট নথুল্লাবাদ',
+    slug: '3-bed-flat-nothullabad-barisal',
+    description:
+      'নথুল্লাবাদ বাস টার্মিনাল সংলগ্ন যাতায়াতে অত্যন্ত সুবিধাজনক ৩ বেডরুমের অ্যাপার্টমেন্ট।',
+    location: 'নথুল্লাবাদ, বরিশাল',
+    district: 'বরিশাল',
+    upazila: 'বরিশাল সদর',
+    area: 'নথুল্লাবাদ',
+    price: 5200000,
+    formattedPrice: '৳ ৫২,০০,০০০',
+    status: 'Published',
+    leadCount: 6,
+    viewCount: 88,
+    verificationStatus: 'Verified',
+    featured: true,
+    published: true,
+    createdAt: '2026-09-04',
+    flatSize: '১৩৫০ বর্গফুট',
+    bedrooms: 3,
+    bathrooms: 2,
+    floor: '৩য় তলা',
+    totalFloors: 6,
+    parking: 'সহজলভ্য পার্কিং',
+    facing: 'উত্তরমুখী',
+    projectName: 'নথুল্লাবাদ টাওয়ার',
+    developer: 'বরিশাল রিয়েল এস্টেট',
+    handoverStatus: 'রেডি ফ্ল্যাট',
+    pricePerSqft: '৳ ৩,৮৫১ / বর্গফুট',
+    images: [
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80'
     ]
   }
 ];

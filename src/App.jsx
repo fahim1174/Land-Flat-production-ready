@@ -8,7 +8,6 @@ import AdminCRM from './components/AdminCRM';
 import { AboutPage, ContactPage, PrivacyPolicyPage, TermsPage, WishlistPage } from './components/OtherPages';
 import { INITIAL_PROPERTIES } from './data/properties';
 import whatsappIcon from './assets/whatsapp.png';
-import messengerIcon from './assets/messenger.png';
 
 function createUniquePropertyId(properties, type) {
   const prefix = type === 'land' ? 'LF-BRL-' : 'LF-BRF-';
@@ -27,9 +26,21 @@ export default function App() {
     if (window.location.pathname === '/admin' || window.location.hash === '#admin') {
       return 'admin';
     }
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('property')) {
+      return 'details';
+    }
     return 'home';
   });
-  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedProperty, setSelectedProperty] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    const propId = params.get('property');
+    if (propId) {
+      const found = INITIAL_PROPERTIES.find((p) => p.id === propId);
+      if (found) return found;
+    }
+    return null;
+  });
   const [properties, setProperties] = useState(() => {
     const savedProperties = localStorage.getItem('land-flat-properties');
     if (!savedProperties) return INITIAL_PROPERTIES;
@@ -82,6 +93,8 @@ export default function App() {
       window.history.pushState({}, '', '/admin');
     } else if (page === 'home') {
       window.history.pushState({}, '', '/');
+    } else if (page === 'details' && property) {
+      window.history.pushState({}, '', `/?property=${property.id}`);
     }
     if (property) {
       setSelectedProperty(property);
@@ -221,8 +234,8 @@ export default function App() {
         )}
       </main>
 
-      <footer className="bg-gray-900 text-gray-300 pt-10 pb-20 md:pb-8 border-t border-gray-800">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-2 gap-x-4 gap-y-6 text-left">
+      <footer className="bg-gray-900 text-gray-300 pt-12 pb-24 md:pb-10 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-2 lg:grid-cols-4 gap-8 text-left">
           <div>
             <div className="flex items-center gap-2 text-white font-bold text-sm sm:text-base mb-2">
               <div className="bg-[#00875A] p-1.5 rounded">
@@ -289,16 +302,6 @@ export default function App() {
           className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#25D366] shadow-lg transition-transform duration-150 active:scale-95 hover:scale-105 animate-pulse"
         >
           <img src={whatsappIcon} alt="WhatsApp" className="h-10 w-10 object-contain" />
-        </a>
-        <a
-          href="https://m.me/washim.akramfahim.9"
-          target="_blank"
-          rel="noopener noreferrer"
-          aria-label="Messenger-এ যোগাযোগ করুন"
-          title="Messenger-এ যোগাযোগ করুন"
-          className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[#0084FF] shadow-lg transition-transform duration-150 active:scale-95 hover:scale-105 animate-pulse"
-        >
-          <img src={messengerIcon} alt="Messenger" className="h-10 w-10 object-contain" />
         </a>
       </div>
 

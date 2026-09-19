@@ -80,7 +80,7 @@ export default function DirectoryPage({ type, properties, navigateTo, wishlist, 
           <p className="text-gray-500 text-sm">দুঃখিত, এই ফিল্টারের সাথে মিলে এমন কোন প্রপার্টি নেই।</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
           {filteredProperties.map((property) => (
             <PropertyCard
               key={property.id}

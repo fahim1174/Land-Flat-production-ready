@@ -1,7 +1,6 @@
 import {
   CheckCircle2,
   ChevronRight,
-  FileCheck2,
   Heart,
   MapPin,
   Share2
@@ -9,12 +8,18 @@ import {
 
 export default function PropertyCard({ property, navigateTo, isWishlisted, toggleWishlist }) {
   const handleShare = async () => {
-    const shareData = { title: property.title, text: property.location, url: window.location.href };
+    const shareUrl = `${window.location.origin}/?property=${property.id}`;
+    const shareData = { title: property.title, text: property.location, url: shareUrl };
 
     if (navigator.share) {
-      await navigator.share(shareData);
+      try {
+        await navigator.share(shareData);
+      } catch {
+        // ignore if aborted
+      }
     } else if (navigator.clipboard) {
-      await navigator.clipboard.writeText(window.location.href);
+      await navigator.clipboard.writeText(shareUrl);
+      alert('প্রপার্টির লিংক কপি করা হয়েছে!');
     }
   };
 
@@ -57,9 +62,6 @@ export default function PropertyCard({ property, navigateTo, isWishlisted, toggl
                 <CheckCircle2 className="w-3 h-3" /> ভেরিফাইড
               </span>
             )}
-            {property.verificationStatus && property.verificationStatus !== 'Pending' && <span className="bg-sky-50 text-sky-700 border border-sky-100 text-[10px] font-semibold px-2 py-1 rounded-md flex items-center gap-1">
-              <FileCheck2 className="w-3 h-3" /> {property.verificationStatus}
-            </span>}
           </div>
 
           <h3 className="font-bold text-gray-900 text-xs sm:text-base line-clamp-2 mb-1.5 sm:mb-2">
@@ -68,34 +70,6 @@ export default function PropertyCard({ property, navigateTo, isWishlisted, toggl
           <p className="text-[11px] sm:text-xs text-gray-500 flex items-center gap-1 mb-2.5 sm:mb-3">
             <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00875A] shrink-0" /> {property.location}
           </p>
-
-          <div className="hidden sm:block bg-gray-50 p-3 rounded-lg text-xs space-y-2 mb-3 border border-gray-100">
-            {property.type === 'land' ? (
-              <>
-                <div className="flex justify-between text-gray-600">
-                  <span>আয়তন:</span> <span className="font-semibold text-gray-800">{property.landSize}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>রাস্তা:</span> <span className="font-semibold text-gray-800">{property.roadWidth}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>জমির ধরণ:</span> <span className="font-semibold text-gray-800">উঁচু {property.landCategory === 'Residential' ? 'আবাসিক' : 'বাণিজ্যিক'}</span>
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="flex justify-between text-gray-600">
-                  <span>সাইজ:</span> <span className="font-semibold text-gray-800">{property.flatSize}</span>
-                </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>বেড/বাথ:</span>{' '}
-                  <span className="font-semibold text-gray-800">
-                    {property.bedrooms} বেড, {property.bathrooms} বাথ
-                  </span>
-                </div>
-              </>
-            )}
-          </div>
 
           <div className="flex items-center justify-between gap-2">
             <div>
