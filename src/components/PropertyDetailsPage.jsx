@@ -147,7 +147,7 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
 
       {/* 3. Specifications Grid */}
       <section className="bg-white rounded-xl p-5 sm:p-6 shadow-sm">
-        <h2 className="font-bold text-base sm:text-lg text-gray-900 mb-3">মূল স্পেসিফিকেশন</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">মূল স্পেসিফিকেশন</h2>
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4">
           {property.type === 'land' ? <>
             <InfoItem label="আয়তন" value={property.landSize} />
@@ -169,7 +169,7 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
 
       {/* 4. Legal Documents */}
       <section className="bg-white rounded-xl p-5 sm:p-6 shadow-sm">
-        <h2 className="font-bold text-base sm:text-lg text-gray-900 mb-3">আইনি ও কাগজপত্রের তথ্য</h2>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">আইনি ও কাগজপত্রের তথ্য</h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-3">
           <InfoItem label="খতিয়ান / নামজারি" value="নামজারি ও খতিয়ান সম্পন্ন" />
           <InfoItem label="রেজিস্ট্রেশন" value={property.verificationStatus === 'Verified' ? 'নিষ্কণ্টক ও ভেরিফাইড' : property.verificationStatus} />
@@ -181,7 +181,7 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
       {/* Location & Description */}
       <section className="bg-white rounded-xl p-5 sm:p-6 shadow-sm space-y-4">
         <div>
-          <h2 className="font-bold text-base sm:text-lg text-gray-900 mb-3">লোকেশন ও আশেপাশের সুবিধা</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">লোকেশন ও আশেপাশের সুবিধা</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
             <InfoItem label="ল্যান্ডমার্ক" value={property.location} />
             <InfoItem label="প্রধান সড়ক" value="প্রায় ২০০ মিটার দূরে" />
@@ -189,7 +189,7 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
           </div>
         </div>
         <div className="mt-8 pt-6 border-t border-slate-100">
-          <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-3">বিস্তারিত বিবরণ</h3>
+          <h3 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3">বিস্তারিত বিবরণ</h3>
           <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">{property.description}</p>
         </div>
       </section>
@@ -197,7 +197,7 @@ export default function PropertyDetailsPage({ property, properties, navigateTo, 
       {/* 5. Contact / Lead Form at the bottom */}
       <section className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200/80">
         <div className="max-w-2xl mx-auto">
-          <h2 className="font-extrabold text-xl sm:text-2xl text-gray-900 mb-1.5 text-center">ভিজিট বা তথ্যের জন্য যোগাযোগ</h2>
+          <h2 className="text-xl sm:text-2xl font-extrabold text-gray-900 mb-1.5 text-center">ভিজিট বা তথ্যের জন্য যোগাযোগ</h2>
           <p className="text-xs sm:text-sm text-gray-500 mb-6 text-center">আমাদের প্রতিনিধি আপনার সাথে যোগাযোগ করবেন।</p>
           
           {inquirySubmitted ? (

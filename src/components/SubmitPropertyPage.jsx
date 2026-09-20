@@ -12,7 +12,7 @@ export default function SubmitPropertyPage({ navigateTo }) {
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-[#00875A] font-semibold text-xs mb-2">
             <Building2 className="w-3.5 h-3.5" /> সহজ ও নিরাপদ লিস্টিং
           </span>
-          <h1 className="text-xl sm:text-3xl font-bold text-gray-900 mb-1">বরিশাল শহরে প্রপার্টির তথ্য দিন</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">বরিশাল শহরে প্রপার্টির তথ্য দিন</h1>
           <p className="text-xs sm:text-sm text-gray-500">আপনার জমা দেওয়া তথ্য সুরক্ষিত থাকবে। আমরা পর্যালোচনা করে আপনার সাথে যোগাযোগ করব।</p>
         </div>
 
